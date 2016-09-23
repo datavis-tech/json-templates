@@ -48,6 +48,28 @@ We wanted the ability to speficy query templates within JSON files, and also mak
 }
 ```
 
+We also needed to know which parameters are required to "fill in" a given query template (in order to check if we have the right context parameters to actually execute the query). Related to this requirement, sometimes certain parameters should have default values. These parameters are not strictly required from the context. If not specified, the default value from the template will be used, otherwise the value from the context will be used. Here's how the above `title` parameter could have a default value of `test`:
+
+```
+{
+  index: 'myindex',
+  body: {
+    query: {
+      match: {
+        title: '{{title:test}}'
+      }
+    },
+    facets: {
+      tags: {
+        terms: {
+          field: 'tags'
+        }
+      }
+    }
+  }
+}
+```
+
 ## Related Work
 
  * [json-templater](https://www.npmjs.com/package/json-templater)
