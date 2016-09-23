@@ -1,12 +1,17 @@
 function parse(value){
-  switch(typeof value) {
+  switch(type(value)) {
     case "string":
       return parseString(value);
     case "object":
       return parseObject(value);
+    case "array":
+      return parseArray(value);
   }
 };
 
+function type(value){
+  return Array.isArray(value) ? "array" : typeof value;
+}
 
 function parseString(str){
   if(isTemplateString(str)){
@@ -38,12 +43,10 @@ function isTemplateString(str){
 // e.g. "{{xyz:foo}}" --> { key: "xyz", defaultValue: "foo" }
 function Parameter(str){
 
-  // Extract the key.
   var parameter = {
     key: str.substring(2, str.length - 2)
   };
 
-  // Handle default values.
   var colonIndex = parameter.key.indexOf(":"); 
   if(colonIndex !== -1){
     parameter.defaultValue = parameter.key.substr(colonIndex + 1);
@@ -77,6 +80,21 @@ function parseObject(object){
     }, {});
   }, children.reduce(function (parameters, child){
     return parameters.concat(child.template.parameters);
+  }, []));
+
+}
+
+
+function parseArray(array){
+
+  var templates = array.map(parse);
+
+  return Template(function (context){
+    return templates.map(function (template){
+      return template(context);
+    });
+  }, templates.reduce(function (parameters, template){
+    return parameters.concat(template.parameters);
   }, []));
 
 }

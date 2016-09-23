@@ -60,20 +60,20 @@ describe("json-template", function() {
 
   });
 
-  //describe("arrays", function() {
+  describe("arrays", function() {
 
-  //  it("should compute template with an array", function() {
-  //    var template = parse(["{{foo}}"]);
+    it("should compute template with an array", function() {
+      var template = parse(["{{foo}}"]);
 
-  //    // deepEqual doesn't do this check correctly.
-  //    assert.equal(
-  //      JSON.stringify(template({ foo: "bar" })),
-  //      '["bar"]'
-  //    );
-  //    assert.deepEqual(template.parameters, [{ key: "foo" }]);
-  //  });
+      // deepEqual doesn't do this check correctly.
+      assert.equal(
+        JSON.stringify(template({ foo: "bar" })),
+        '["bar"]'
+      );
+      assert.deepEqual(template.parameters, [{ key: "foo" }]);
+    });
 
-  //});
+  });
 });
 
 // "{{}}"
