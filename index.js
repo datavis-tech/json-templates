@@ -12,7 +12,11 @@ function parse(value){
 };
 
 function type(value){
-  return Array.isArray(value) ? "array" : typeof value;
+  return (
+    Array.isArray(value) ? "array" : 
+    value instanceof Date ? "date" : 
+    typeof value
+  );
 }
 
 function parseString(str){

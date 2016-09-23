@@ -105,6 +105,7 @@ describe("json-template", function() {
 
   });
 
+
   describe("arrays", function() {
 
     it("should compute template with an array", function() {
@@ -127,6 +128,29 @@ describe("json-template", function() {
 
   });
 
+
+  describe("unknown types", function() {
+
+    it("should compute template with numbers", function() {
+      var template = parse(1);
+      assert.deepEqual(template.parameters, []);
+      assert.equal(template(), 1);
+    });
+
+    it("should compute template with booleans", function() {
+      var template = parse(true);
+      assert.deepEqual(template.parameters, []);
+      assert.equal(template(), true);
+    });
+
+    it("should compute template with dates", function() {
+      var value = new Date(1474625208848);
+      var template = parse(value);
+      assert.deepEqual(template.parameters, []);
+      assert.equal(template(), value);
+    });
+
+  });
 
   describe("mixed data structures", function() {
 
