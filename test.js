@@ -1,8 +1,16 @@
+// These are the unit tests for the library.
+// Run them with the command `npm test`.
+// By Curran Kelleher
+// September 2016
+
 var assert = require("assert");
 var parse = require("./index");
 
 describe("json-template", function() {
 
+  // Handling of strings is the most critical part of the functionality.
+  // This section tests the string templating functionality,
+  // including default values and edge cases.
   describe("strings", function() {
 
     it("should compute template for a string with a single parameter", function() {
@@ -53,6 +61,8 @@ describe("json-template", function() {
   });
 
 
+  // This section tests that the parse function recursively
+  // traverses objects, and applies the string templating correctly.
   describe("objects", function() {
 
     it("should compute template with an object", function() {
@@ -106,6 +116,8 @@ describe("json-template", function() {
   });
 
 
+  // This section tests that the parse function recursively
+  // traverses arrays, and applies the string templating correctly.
   describe("arrays", function() {
 
     it("should compute template with an array", function() {
@@ -129,6 +141,8 @@ describe("json-template", function() {
   });
 
 
+  // This section tests that arbitrary types may be present
+  // as leaf nodes of the object tree, and they are handled correctly.
   describe("unknown types", function() {
 
     it("should compute template with numbers", function() {
@@ -144,7 +158,14 @@ describe("json-template", function() {
     });
 
     it("should compute template with dates", function() {
-      var value = new Date(1474625208848);
+      var value = new Date();
+      var template = parse(value);
+      assert.deepEqual(template.parameters, []);
+      assert.equal(template(), value);
+    });
+
+    it("should compute template with functions", function() {
+      var value = function (){ return "foo"; };
       var template = parse(value);
       assert.deepEqual(template.parameters, []);
       assert.equal(template(), value);
@@ -152,6 +173,9 @@ describe("json-template", function() {
 
   });
 
+  // This section tests for our main use case of this library - ElasticSearch queries.
+  // These examples demonstrate that the templating works for complex object structures
+  // that we will encounter when using the templating functionality with ElasticSearch.
   describe("mixed data structures", function() {
 
     it("should compute template with ElasticSearch query", function() {
