@@ -85,51 +85,11 @@ The parse function also handles nested arrays and arbitrary leaf values. For mor
 
 ## Why?
 
-The use case for this came about while working with ElasticSearch queries that need to be parameterized. As an example, consider the following ElasticSearch query (from the [ElasticSearch.js Documentation](https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/api-reference.html#api-search):
+The use case for this came about while working with ElasticSearch queries that need to be parameterized. We wanted the ability to *speficy query templates within JSON*, and also make any of the string values parameterizable. The ideas was to make something kind of like [Handlebars](http://handlebarsjs.com/), but just for the values within the query.
 
-```
-{
-  index: 'myindex',
-  body: {
-    query: {
-      match: {
-        title: 'test'
-      }
-    },
-    facets: {
-      tags: {
-        terms: {
-          field: 'tags'
-        }
-      }
-    }
-  }
-}
-```
+We also needed to know which parameters are required to "fill in" a given query template (in order to check if we have the right context parameters to actually execute the query). Related to this requirement, sometimes certain parameters should have default values. These parameters are not strictly required from the context. If not specified, the default value from the template will be used, otherwise the value from the context will be used.
 
-We wanted the ability to speficy query templates within JSON files, and also make any of the string values parameterizable. The ideas was to make something kind of like [Handlebars](http://handlebarsjs.com/), but just for the values within the query. For example, here's what the above query template would look like with a parameterizable title:
-
-```
-{
-  index: 'myindex',
-  body: {
-    query: {
-      match: {
-        title: '{{title}}'
-      }
-    },
-    facets: {
-      tags: {
-        terms: {
-          field: 'tags'
-        }
-      }
-    }
-  }
-}
-```
-
-We also needed to know which parameters are required to "fill in" a given query template (in order to check if we have the right context parameters to actually execute the query). Related to this requirement, sometimes certain parameters should have default values. These parameters are not strictly required from the context. If not specified, the default value from the template will be used, otherwise the value from the context will be used. Here's how the above `title` parameter could have a default value of `test`:
+Here's how the above `title` parameter could have a default value of `test`:
 
 ```
 {
@@ -150,6 +110,8 @@ We also needed to know which parameters are required to "fill in" a given query 
   }
 }
 ```
+
+Also it was a fun challenge and a great opportunity to write some heady recursive functional code.
 
 ## Related Work
 
