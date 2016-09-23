@@ -1,5 +1,5 @@
 var assert = require("assert");
-var parse = require(".index");
+var parse = require("./index");
 
 describe("json-template", function() {
   it("should compute template for a string", function() {
