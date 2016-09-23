@@ -7,9 +7,10 @@ function parse(value){
   }
 };
 
-function parseString(value){
-  if(isTemplateString(value)){
-    var parameter = Parameter(value);
+
+function parseString(str){
+  if(isTemplateString(str)){
+    var parameter = Parameter(str);
     return Template(function (context){
       if(typeof context === "undefined"){
         context = {};
@@ -18,31 +19,10 @@ function parseString(value){
     }, [parameter]);
   } else {
     return Template(function (){
-      return value;
+      return str;
     }, []);
   }
 }
-
-function parseObject(value){
-
-  var children = Object.keys(value).map(function (key){
-    return {
-      key: key,
-      template: parse(value[key])
-    };
-  });
-
-  return Template(function (context){
-    return children.reduce(function (newValue, child){
-      newValue[child.key] = child.template(context);
-      return newValue;
-    }, {});
-  }, children.reduce(function (parameters, child){
-    return parameters.concat(child.template.parameters);
-  }, []));
-
-}
-
 // Checks whether a given string fits the form {{xyz}}.
 function isTemplateString(str){
   return (
@@ -53,7 +33,6 @@ function isTemplateString(str){
       (str.substr(str.length - 2, 2) === "}}")
   );
 }
-
 // Constructs a parameter object from the given template string.
 // e.g. "{{xyz}}" --> { key: "xyz" }
 // e.g. "{{xyz:foo}}" --> { key: "xyz", defaultValue: "foo" }
@@ -74,10 +53,32 @@ function Parameter(str){
   return parameter;
 }
 
+
 // Constructs a template function with `parameters` property.
 function Template(fn, parameters){
   fn.parameters = parameters;
   return fn;
+}
+
+
+function parseObject(object){
+
+  var children = Object.keys(object).map(function (key){
+    return {
+      key: key,
+      template: parse(object[key])
+    };
+  });
+
+  return Template(function (context){
+    return children.reduce(function (newObject, child){
+      newObject[child.key] = child.template(context);
+      return newObject;
+    }, {});
+  }, children.reduce(function (parameters, child){
+    return parameters.concat(child.template.parameters);
+  }, []));
+
 }
 
 module.exports = parse;
