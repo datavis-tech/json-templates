@@ -1,6 +1,6 @@
 module.exports = function parse(value){
   if(isTemplateString(value)){
-    var parameter = parseTemplateString(value);
+    var parameter = Parameter(value);
 
     var template = function (context){
       if(typeof context === "undefined"){
@@ -20,6 +20,7 @@ module.exports = function parse(value){
   }
 };
 
+// Checks whether a given string fits the form {{xyz}}.
 function isTemplateString(str){
   return (
       (str.length > 5)
@@ -30,11 +31,17 @@ function isTemplateString(str){
   );
 }
 
-function parseTemplateString(str){
+// Constructs a parameter object from the given template string.
+// e.g. "{{xyz}}" --> { key: "xyz" }
+// e.g. "{{xyz:foo}}" --> { key: "xyz", defaultValue: "foo" }
+function Parameter(str){
+
+  // Extract the key.
   var parameter = {
     key: str.substring(2, str.length - 2)
   };
 
+  // Handle default values.
   var colonIndex = parameter.key.indexOf(":"); 
   if(colonIndex !== -1){
     parameter.defaultValue = parameter.key.substr(colonIndex + 1);
