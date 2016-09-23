@@ -1,22 +1,47 @@
-module.exports = function parse(value){
+function parse(value){
+  switch(typeof value) {
+    case "string":
+      return parseString(value);
+    case "object":
+      return parseObject(value);
+  }
+};
+
+function parseString(value){
   if(isTemplateString(value)){
     var parameter = Parameter(value);
-
     return Template(function (context){
       if(typeof context === "undefined"){
         context = {};
       }
       return context[parameter.key] || parameter.defaultValue;
     }, [parameter]);
-
   } else {
-
     return Template(function (){
       return value;
     }, []);
-
   }
-};
+}
+
+function parseObject(value){
+
+  var children = Object.keys(value).map(function (key){
+    return {
+      key: key,
+      template: parse(value[key])
+    };
+  });
+
+  return Template(function (context){
+    return children.reduce(function (newValue, child){
+      newValue[child.key] = child.template(context);
+      return newValue;
+    }, {});
+  }, children.reduce(function (parameters, child){
+    return parameters.concat(child.template.parameters);
+  }, []));
+
+}
 
 // Checks whether a given string fits the form {{xyz}}.
 function isTemplateString(str){
@@ -54,3 +79,5 @@ function Template(fn, parameters){
   fn.parameters = parameters;
   return fn;
 }
+
+module.exports = parse;
