@@ -48,6 +48,16 @@ describe("json-template", function() {
       assert.deepEqual(template.parameters, [{ key: "foo" }]);
     });
 
+    it("should compute template with nested objects", function() {
+      var template = parse({
+        body: {
+          title: "{{foo}}"
+        }
+      });
+      assert.deepEqual(template({ foo: "bar" }), { body: { title: "bar" }});
+      assert.deepEqual(template.parameters, [{ key: "foo" }]);
+    });
+
   });
 });
 
