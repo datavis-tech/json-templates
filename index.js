@@ -1,10 +1,16 @@
 module.exports = function parse(value){
   if(isTemplateString(value)){
-    var key = templateStringKey(value);
+    var parameter = parseTemplateString(value);
+
     var template = function (context){
-      return context[key];
+      if(typeof context === "undefined"){
+        context = {};
+      }
+      return context[parameter.key] || parameter.defaultValue;
     };
-    template.parameters = [{ key: key }];
+
+    template.parameters = [parameter];
+
     return template;
   }
 };
@@ -19,6 +25,16 @@ function isTemplateString(str){
   );
 }
 
-function templateStringKey(str){
-  return str.substring(2, str.length - 2);
+function parseTemplateString(str){
+  var parameter = {
+    key: str.substring(2, str.length - 2)
+  };
+
+  var colonIndex = parameter.key.indexOf(":"); 
+  if(colonIndex !== -1){
+    parameter.defaultValue = parameter.key.substr(colonIndex + 1);
+    parameter.key = parameter.key.substr(0, colonIndex);
+  }
+
+  return parameter;
 }
