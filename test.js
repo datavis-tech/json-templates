@@ -7,8 +7,8 @@ describe("json-template", function() {
 
     it("should compute template for a string with a single parameter", function() {
       var template = parse("{{foo}}");
-      assert.equal(template({ foo: "bar" }), "bar");
       assert.deepEqual(template.parameters, [{ key: "foo" }]);
+      assert.equal(template({ foo: "bar" }), "bar");
     });
 
     it("should compute template for strings with no parameters", function() {
@@ -19,22 +19,35 @@ describe("json-template", function() {
         "}}foo{{"
       ].forEach(function (value){
         var template = parse(value);
-        assert.equal(template(), value);
         assert.deepEqual(template.parameters, []);
+        assert.equal(template(), value);
       });
     });
 
     it("should compute template with default for a string", function() {
       var template = parse("{{foo:bar}}");
-      assert.equal(template(), "bar");
-      assert.equal(template({ foo: "baz" }), "baz");
-      assert.equal(template({ unknownParam: "baz" }), "bar");
       assert.deepEqual(template.parameters, [
         {
           key: "foo",
           defaultValue: "bar"
         }
       ]);
+      assert.equal(template(), "bar");
+      assert.equal(template({ foo: "baz" }), "baz");
+      assert.equal(template({ unknownParam: "baz" }), "bar");
+    });
+
+    it("should compute template with default for a string with multiple colons", function() {
+      var template = parse("{{foo:bar:baz}}");
+      assert.deepEqual(template.parameters, [
+        {
+          key: "foo",
+          defaultValue: "bar:baz"
+        }
+      ]);
+      assert.equal(template(), "bar:baz");
+      assert.equal(template({ foo: "baz" }), "baz");
+      assert.equal(template({ unknownParam: "baz" }), "bar:baz");
     });
 
   });
@@ -44,8 +57,8 @@ describe("json-template", function() {
 
     it("should compute template with an object", function() {
       var template = parse({ title: "{{foo}}" });
-      assert.deepEqual(template({ foo: "bar" }), { title: "bar" });
       assert.deepEqual(template.parameters, [{ key: "foo" }]);
+      assert.deepEqual(template({ foo: "bar" }), { title: "bar" });
     });
 
     it("should compute template with an object with multiple parameters", function() {
@@ -55,6 +68,11 @@ describe("json-template", function() {
         description: "{{myDescription}}"
       });
 
+      assert.deepEqual(template.parameters, [
+        { key: "myTitle" },
+        { key: "myDescription"}
+      ]);
+
       assert.deepEqual(template({
         myTitle: "foo",
         myDescription: "bar"
@@ -63,21 +81,26 @@ describe("json-template", function() {
         description: "bar"
       });
 
-      assert.deepEqual(template.parameters, [
-        { key: "myTitle" },
-        { key: "myDescription"}
-      ]);
-
     });
 
     it("should compute template with nested objects", function() {
+
       var template = parse({
         body: {
           title: "{{foo}}"
         }
       });
-      assert.deepEqual(template({ foo: "bar" }), { body: { title: "bar" }});
-      assert.deepEqual(template.parameters, [{ key: "foo" }]);
+
+      assert.deepEqual(template.parameters, [
+        { key: "foo" }
+      ]);
+
+      assert.deepEqual(template({ foo: "bar" }), {
+        body: {
+          title: "bar"
+        }
+      });
+
     });
 
   });
@@ -86,20 +109,20 @@ describe("json-template", function() {
 
     it("should compute template with an array", function() {
       var template = parse(["{{foo}}"]);
+      assert.deepEqual(template.parameters, [{ key: "foo" }]);
       assert.equal(
         JSON.stringify(template({ foo: "bar" })),
         '["bar"]'
       );
-      assert.deepEqual(template.parameters, [{ key: "foo" }]);
     });
 
     it("should compute template with a nested array", function() {
       var template = parse([["{{foo}}"]]);
+      assert.deepEqual(template.parameters, [{ key: "foo" }]);
       assert.equal(
         JSON.stringify(template({ foo: "bar" })),
         '[["bar"]]'
       );
-      assert.deepEqual(template.parameters, [{ key: "foo" }]);
     });
 
   });
