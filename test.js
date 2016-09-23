@@ -126,38 +126,212 @@ describe("json-template", function() {
     });
 
   });
+
+
+  describe("mixed data structures", function() {
+
+    it("should compute template with ElasticSearch query", function() {
+
+      // Query example from https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/api-reference.html#api-search
+      var template = parse({
+        index: "myindex",
+        body: {
+          query: {
+            match: {
+              title: "{{title}}"
+            }
+          },
+          facets: {
+            tags: {
+              terms: {
+                field: "tags"
+              }
+            }
+          }
+        }
+      });
+
+      assert.deepEqual(template.parameters, [{ key: "title" }]);
+
+      assert.deepEqual(
+        template({ title: "test" }),
+        {
+          index: "myindex",
+          body: {
+            query: {
+              match: {
+                title: "test"
+              }
+            },
+            facets: {
+              tags: {
+                terms: {
+                  field: "tags"
+                }
+              }
+            }
+          }
+        }
+      );
+    });
+
+    it("should compute template with ElasticSearch query including default value", function() {
+
+      var template = parse({
+        index: "myindex",
+        body: {
+          query: {
+            match: {
+              title: "{{title:test}}"
+            }
+          },
+          facets: {
+            tags: {
+              terms: {
+                field: "tags"
+              }
+            }
+          }
+        }
+      });
+
+      assert.deepEqual(template.parameters, [{
+        key: "title",
+        defaultValue: "test"
+      }]);
+
+      assert.deepEqual(
+        template(),
+        {
+          index: "myindex",
+          body: {
+            query: {
+              match: {
+                title: "test"
+              }
+            },
+            facets: {
+              tags: {
+                terms: {
+                  field: "tags"
+                }
+              }
+            }
+          }
+        }
+      );
+
+      assert.deepEqual(
+        template({ title: "foo" }),
+        {
+          index: "myindex",
+          body: {
+            query: {
+              match: {
+                title: "foo"
+              }
+            },
+            facets: {
+              tags: {
+                terms: {
+                  field: "tags"
+                }
+              }
+            }
+          }
+        }
+      );
+    });
+
+    it("should compute template with ElasticSearch query including arrays", function() {
+
+      // Query example from https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-bool-query.html
+      var template = parse({
+        "bool": {
+          "must": {
+            "term": {
+              "user": "kimchy"
+            }
+          },
+          "filter": {
+            "term": {
+              "tag": "tech"
+            }
+          },
+          "must_not": {
+            "range": {
+              "age": {
+                "from": 10,
+                "to": 20
+              }
+            }
+          },
+          "should": [
+            {
+              "term": {
+                "tag": "{{myTag1}}"
+              }
+            },
+            {
+              "term": {
+                "tag": "{{myTag2}}"
+              }
+            }
+          ],
+          "minimum_should_match": 1,
+          "boost": 1
+        }
+      });
+
+      assert.deepEqual(template.parameters, [
+        { key: "myTag1" },
+        { key: "myTag2" }
+      ]);
+
+      assert.deepEqual(
+        template({
+          myTag1: "wow",
+          myTag2: "cats",
+        }),
+        {
+          "bool": {
+            "must": {
+              "term": {
+                "user": "kimchy"
+              }
+            },
+            "filter": {
+              "term": {
+                "tag": "tech"
+              }
+            },
+            "must_not": {
+              "range": {
+                "age": {
+                  "from": 10,
+                  "to": 20
+                }
+              }
+            },
+            "should": [
+              {
+                "term": {
+                  "tag": "wow"
+                }
+              },
+              {
+                "term": {
+                  "tag": "cats"
+                }
+              }
+            ],
+            "minimum_should_match": 1,
+            "boost": 1
+          }
+        }
+      );
+
+    });
+
+  });
 });
-
-// "{{}}"
-// "}}{{"
-// "}}foo{{"
-// "{{foo:bar:baz}}"
-
-//
-//var template = parse({ "PersonName": "{{person}}" });
-//expect(template.parameters).to.equal(
-//  [
-//    {
-//      key: "person",
-//      path: ["PersonName"]
-//    }
-//  ]
-//);
-//expect(template({ person: "Susanna" })).to.equal(
-//  { "PersonName": "Susanna" }
-//);
-//
-//{ "PersonName": "{{person:Bob}}" }
-//
-//[
-//  {
-//    key: "person",
-//    defaultValue: "Bob",
-//    path: ["PersonName"]
-//  }
-//]
-//
-//{ "gte": "{{startDate:now-24h}}" }
-//{ "index": "{{index}}" }
-
-

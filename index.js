@@ -6,6 +6,8 @@ function parse(value){
       return parseObject(value);
     case "array":
       return parseArray(value);
+    default:
+      return Template(function (){ return value; }, []);
   }
 };
 
