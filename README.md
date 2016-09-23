@@ -2,6 +2,85 @@
 
 Simple JSON value templating.
 
+## Usage
+
+Here's how you can use this library. Begin by installing via NPM:
+
+`npm install json-templates`
+
+Here's a small example of usage showing the simplest case, a single string.
+
+```js
+var parse = require("json-templates");
+
+var template = parse("{{foo}}");
+
+console.log(template.parameters); // Prints [{ key: "foo" }]
+
+console.log(template({ foo: "bar" })); // Prints "bar"
+```
+
+Parameters can have default values, specified using a colon.
+
+```js
+var template = parse("{{foo:bar}}");
+
+console.log(template.parameters); // Prints [{ key: "foo", defaultValue: "bar" }]
+
+console.log(template()); // Prints "bar", using the default value.
+
+console.log(template({ foo: "baz" })); // Prints "baz", using the given value.
+```
+
+The kind of templating you can see in the above examples gets applied to any string values in complex object structures such as ElasticSearch queries. Here's an example of an ElasticSearch query.
+
+```js
+var template = parse({
+  index: "myindex",
+  body: {
+    query: {
+      match: {
+        title: "{{myTitle}}"
+      }
+    },
+    facets: {
+      tags: {
+        terms: {
+          field: "tags"
+        }
+      }
+    }
+  }
+});
+
+console.log(template.parameters); // Prints [{ key: "myTitle" }]
+
+console.log(template({ title: "test" }));
+```
+
+The last line prints the following output:
+
+```json
+{
+  index: "myindex",
+  body: {
+    query: {
+      match: {
+        title: "test"
+      }
+    },
+    facets: {
+      tags: {
+        terms: {
+          field: "tags"
+        }
+      }
+    }
+  }
+}
+```
+
+
 ## Why?
 
 The use case for this came about while working with ElasticSearch queries that need to be parameterized. As an example, consider the following ElasticSearch query (from the [ElasticSearch.js Documentation](https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/api-reference.html#api-search):
