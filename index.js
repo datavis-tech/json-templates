@@ -2,21 +2,19 @@ module.exports = function parse(value){
   if(isTemplateString(value)){
     var parameter = Parameter(value);
 
-    var template = function (context){
+    return Template(function (context){
       if(typeof context === "undefined"){
         context = {};
       }
       return context[parameter.key] || parameter.defaultValue;
-    };
-    template.parameters = [parameter];
-    return template;
+    }, [parameter]);
 
   } else {
-    var template = function (context){
+
+    return Template(function (){
       return value;
-    };
-    template.parameters = [];
-    return template;
+    }, []);
+
   }
 };
 
@@ -49,4 +47,10 @@ function Parameter(str){
   }
 
   return parameter;
+}
+
+// Constructs a template function with `parameters` property.
+function Template(fn, parameters){
+  fn.parameters = parameters;
+  return fn;
 }
