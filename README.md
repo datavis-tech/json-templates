@@ -58,9 +58,9 @@ console.log(template.parameters); // Prints [{ key: "myTitle" }]
 console.log(template({ title: "test" }));
 ```
 
-The last line prints the following output:
+The last line prints the following structure:
 
-```json
+```js
 {
   index: "myindex",
   body: {
@@ -79,6 +79,8 @@ The last line prints the following output:
   }
 }
 ```
+
+The parse function also handles nested arrays and arbitrary leaf values. For more detailed examples, check out the [tests](https://github.com/curran/json-templates/blob/master/test.js).
 
 
 ## Why?
