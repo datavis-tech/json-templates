@@ -3,10 +3,16 @@ var parse = require("./index");
 
 describe("json-template", function() {
 
-  it("should compute template for a string", function() {
+  it("should compute template for a string with a single parameter", function() {
     var template = parse("{{foo}}");
     assert.equal(template({ foo: "bar" }), "bar");
     assert.deepEqual(template.parameters, [{ key: "foo" }]);
+  });
+
+  it("should compute template for a string with no parameters", function() {
+    var template = parse("foo");
+    assert.equal(template(), "foo");
+    assert.deepEqual(template.parameters, []);
   });
 
   it("should compute template with default for a string", function() {

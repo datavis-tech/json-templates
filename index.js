@@ -8,9 +8,14 @@ module.exports = function parse(value){
       }
       return context[parameter.key] || parameter.defaultValue;
     };
-
     template.parameters = [parameter];
+    return template;
 
+  } else {
+    var template = function (context){
+      return value;
+    };
+    template.parameters = [];
     return template;
   }
 };
