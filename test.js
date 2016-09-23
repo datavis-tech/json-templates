@@ -9,16 +9,24 @@ describe("json-template", function() {
     assert.deepEqual(template.parameters, [{ key: "foo" }]);
   });
 
-  it("should compute template for a string with no parameters", function() {
-    var template = parse("foo");
-    assert.equal(template(), "foo");
-    assert.deepEqual(template.parameters, []);
+  it("should compute template for strings with no parameters", function() {
+    [
+      "foo",
+      "{{}}",
+      "}}{{",
+      "}}foo{{"
+    ].forEach(function (value){
+      var template = parse(value);
+      assert.equal(template(), value);
+      assert.deepEqual(template.parameters, []);
+    });
   });
 
   it("should compute template with default for a string", function() {
     var template = parse("{{foo:bar}}");
     assert.equal(template(), "bar");
     assert.equal(template({ foo: "baz" }), "baz");
+    assert.equal(template({ unknownParam: "baz" }), "bar");
     assert.deepEqual(template.parameters, [
       {
         key: "foo",
