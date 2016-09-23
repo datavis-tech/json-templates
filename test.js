@@ -43,9 +43,31 @@ describe("json-template", function() {
   describe("objects", function() {
 
     it("should compute template with an object", function() {
-      var template = parse({ title: "{{foo}}"});
+      var template = parse({ title: "{{foo}}" });
       assert.deepEqual(template({ foo: "bar" }), { title: "bar" });
       assert.deepEqual(template.parameters, [{ key: "foo" }]);
+    });
+
+    it("should compute template with an object with multiple parameters", function() {
+
+      var template = parse({
+        title: "{{myTitle}}",
+        description: "{{myDescription}}"
+      });
+
+      assert.deepEqual(template({
+        myTitle: "foo",
+        myDescription: "bar"
+      }), {
+        title: "foo",
+        description: "bar"
+      });
+
+      assert.deepEqual(template.parameters, [
+        { key: "myTitle" },
+        { key: "myDescription"}
+      ]);
+
     });
 
     it("should compute template with nested objects", function() {
@@ -64,11 +86,18 @@ describe("json-template", function() {
 
     it("should compute template with an array", function() {
       var template = parse(["{{foo}}"]);
-
-      // deepEqual doesn't do this check correctly.
       assert.equal(
         JSON.stringify(template({ foo: "bar" })),
         '["bar"]'
+      );
+      assert.deepEqual(template.parameters, [{ key: "foo" }]);
+    });
+
+    it("should compute template with a nested array", function() {
+      var template = parse([["{{foo}}"]]);
+      assert.equal(
+        JSON.stringify(template({ foo: "bar" })),
+        '[["bar"]]'
       );
       assert.deepEqual(template.parameters, [{ key: "foo" }]);
     });
