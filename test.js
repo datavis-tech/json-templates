@@ -58,12 +58,24 @@ describe("json-template", function() {
       assert.equal(template({ unknownParam: "baz" }), "bar:baz");
     });
 
+    it("should compute template for a string with inner parameter", function() {
+      var template = parse("Hello {{foo}}, how are you ?");
+      assert.deepEqual(template.parameters, [{ key: "foo" }]);
+      assert.equal(template({ foo: "john" }), "Hello john, how are you ?");
+    });
+
   });
 
 
   // This section tests that the parse function recursively
   // traverses objects, and applies the string templating correctly.
   describe("objects", function() {
+
+    it("should compute template with an object that has inner parameter", function() {
+      var template = parse({ title: "Hello {{foo}}, how are you ?" });
+      assert.deepEqual(template.parameters, [{ key: "foo" }]);
+      assert.deepEqual(template({ foo: "john" }), { title: "Hello john, how are you ?" });
+    });
 
     it("should compute template with an object", function() {
       var template = parse({ title: "{{foo}}" });
