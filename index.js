@@ -4,6 +4,7 @@
 // By Curran Kelleher
 // September 2016
 
+const regex = new RegExp(/{{(\w+)(:?(.*))+}}/i);
 
 // Parses the given template object.
 // Returns a function `template(context)` that will "fill in" the template
@@ -29,8 +30,8 @@ function parse(value){
 // handles arrays and dates as well.
 function type(value){
   return (
-    Array.isArray(value) ? "array" : 
-    value instanceof Date ? "date" : 
+    Array.isArray(value) ? "array" :
+    value instanceof Date ? "date" :
     typeof value
   );
 }
@@ -38,12 +39,13 @@ function type(value){
 // Parses leaf nodes of the template object that are strings.
 function parseString(str){
   if(isTemplateString(str)){
-    var parameter = Parameter(str);
+    var match     = str.match(regex),
+        parameter = Parameter(match);
     return Template(function (context){
       if(typeof context === "undefined"){
         context = {};
       }
-      return context[parameter.key] || parameter.defaultValue;
+      return str.replace(match[0], context[parameter.key] || parameter.defaultValue);
     }, [parameter]);
   } else {
     return Template(function (){
@@ -54,29 +56,19 @@ function parseString(str){
 
 // Checks whether a given string fits the form {{xyz}}.
 function isTemplateString(str){
-  return (
-      (str.length > 5)
-    &&
-      (str.substr(0, 2) === "{{")
-    &&
-      (str.substr(str.length - 2, 2) === "}}")
-  );
+  return regex.test(str);
 }
 
-// Constructs a parameter object from the given template string.
-// e.g. "{{xyz}}" --> { key: "xyz" }
-// e.g. "{{xyz:foo}}" --> { key: "xyz", defaultValue: "foo" }
-function Parameter(str){
-
+// Constructs a parameter object from a match result.
+// e.g. "['{{foo}}','foo','','',index:0,input:'{{foo}}']" --> { key: "foo" }
+// e.g. "['{{foo:bar}}','foo',':bar','bar',index:0,input:'{{foo:bar}}']" --> { key: "foo", defaultValue: "bar" }
+function Parameter(match){
   var parameter = {
-    key: str.substring(2, str.length - 2)
+    key: match[1],
   };
 
-  var colonIndex = parameter.key.indexOf(":"); 
-  if(colonIndex !== -1){
-    parameter.defaultValue = parameter.key.substr(colonIndex + 1);
-    parameter.key = parameter.key.substr(0, colonIndex);
-  }
+  if (match[3] && match[3].length > 0)
+    parameter.defaultValue = match[3];
 
   return parameter;
 }
