@@ -86,18 +86,18 @@ function parseObject(object){
 
   var children = Object.keys(object).map(function (key){
     return {
-      key: key,
-      template: parse(object[key])
+      keyTemplate: parse(key),
+      valueTemplate: parse(object[key])
     };
   });
 
   return Template(function (context){
     return children.reduce(function (newObject, child){
-      newObject[child.key] = child.template(context);
+      newObject[child.keyTemplate(context)] = child.valueTemplate(context);
       return newObject;
     }, {});
   }, children.reduce(function (parameters, child){
-    return parameters.concat(child.template.parameters);
+      return parameters.concat(child.valueTemplate.parameters.concat(child.keyTemplate.parameters));
   }, []));
 
 }
