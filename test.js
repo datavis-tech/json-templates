@@ -125,6 +125,46 @@ describe("json-template", function() {
 
     });
 
+    it("should compute template keys", function() {
+
+      var template = parse({
+        body: {
+          "A simple {{message}} to": "{{foo}}"
+        }
+      });
+
+      assert.deepEqual(template.parameters, [
+        { key: "foo" },
+        { key: "message"}
+      ]);
+
+      assert.deepEqual(template({ foo: "bar", message: "hello" }), {
+        body: {
+          "A simple hello to": "bar"
+        }
+      });
+    });
+
+    it("should compute template keys with default value", function() {
+
+      var template = parse({
+        body: {
+          "A simple {{message:hello}} to": "{{foo}}"
+        }
+      });
+
+      assert.deepEqual(template.parameters, [
+        { key: "foo" },
+        { key: "message", defaultValue: "hello"}
+      ]);
+
+      assert.deepEqual(template({ foo: "bar" }), {
+        body: {
+          "A simple hello to": "bar"
+        }
+      });
+    });
+
   });
 
 
