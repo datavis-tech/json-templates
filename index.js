@@ -49,16 +49,19 @@ var parseString = (function (){
 
   return function (str){
     if(regex.test(str)){
-      var matches = str.match(regex);
-      var parameters = matches.map(Parameter);
+
+      var matches = str.match(regex),
+          parameters = matches.map(Parameter);
+
       return Template(function (context){
-        if(typeof context === "undefined"){
-          context = {};
-        }
-        var match = matches[0];
-        var parameter = parameters[0];
-        return str.replace(match, context[parameter.key] || parameter.defaultValue);
+        context = context || {};
+        return matches.reduce(function (str, match, i){
+          var parameter = parameters[i];
+          var value = context[parameter.key] || parameter.defaultValue;
+          return str.replace(match, value);
+        }, str);
       }, parameters);
+
     } else {
       return Template(function (){
         return str;
@@ -69,8 +72,8 @@ var parseString = (function (){
 
 
 // Constructs a parameter object from a match result.
-// e.g. "['{{foo}}','foo','','',index:0,input:'{{foo}}']" --> { key: "foo" }
-// e.g. "['{{foo:bar}}','foo',':bar','bar',index:0,input:'{{foo:bar}}']" --> { key: "foo", defaultValue: "bar" }
+// e.g. "['{{foo}}']" --> { key: "foo" }
+// e.g. "['{{foo:bar}}']" --> { key: "foo", defaultValue: "bar" }
 function Parameter(match){
   match = match.substr(2, match.length - 4);
   var i = match.indexOf(":");
