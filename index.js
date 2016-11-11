@@ -45,7 +45,7 @@ var parseString = (function (){
 
   // This regular expression detects instances of the
   // template parameter syntax such as {{foo}} or {{foo:someDefault}}.
-  var regex = /{{(\w|:)+}}/g;
+  var regex = /{{(\w|:|\s)+}}/g;
 
   return function (str){
     if(regex.test(str)){
@@ -75,7 +75,7 @@ var parseString = (function (){
 // e.g. "['{{foo}}']" --> { key: "foo" }
 // e.g. "['{{foo:bar}}']" --> { key: "foo", defaultValue: "bar" }
 function Parameter(match){
-  match = match.substr(2, match.length - 4);
+  match = match.substr(2, match.length - 4).trim();
   var i = match.indexOf(":");
   if(i !== -1){
     return {

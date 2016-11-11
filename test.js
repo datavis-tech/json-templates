@@ -70,6 +70,12 @@ describe("json-template", function() {
       assert.equal(template({ firstName: "Jane", lastName: "Doe" }), "Hello Jane Doe, how are you ?");
     });
 
+    it("should handle extra whitespace", function() {
+      var template = parse("Hello {{firstName }} {{ lastName}}, how are you ?");
+      assert.deepEqual(template.parameters, [{ key: "firstName" }, { key: "lastName" }]);
+      assert.equal(template({ firstName: "Jane", lastName: "Doe" }), "Hello Jane Doe, how are you ?");
+    });
+
   });
 
 
