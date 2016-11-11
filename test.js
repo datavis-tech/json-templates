@@ -64,6 +64,18 @@ describe("json-template", function() {
       assert.equal(template({ foo: "john" }), "Hello john, how are you ?");
     });
 
+    it("should compute template for a string with multiple inner parameters", function() {
+      var template = parse("Hello {{firstName}} {{lastName}}, how are you ?");
+      assert.deepEqual(template.parameters, [{ key: "firstName" }, { key: "lastName" }]);
+      assert.equal(template({ firstName: "Jane", lastName: "Doe" }), "Hello Jane Doe, how are you ?");
+    });
+
+    it("should handle extra whitespace", function() {
+      var template = parse("Hello {{firstName }} {{ lastName}}, how are you ?");
+      assert.deepEqual(template.parameters, [{ key: "firstName" }, { key: "lastName" }]);
+      assert.equal(template({ firstName: "Jane", lastName: "Doe" }), "Hello Jane Doe, how are you ?");
+    });
+
   });
 
 

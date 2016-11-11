@@ -45,18 +45,23 @@ var parseString = (function (){
 
   // This regular expression detects instances of the
   // template parameter syntax such as {{foo}} or {{foo:someDefault}}.
-  var regex = /{{(\w+)(:?(.*))+}}/i;
+  var regex = /{{(\w|:|\s)+}}/g;
 
   return function (str){
     if(regex.test(str)){
-      var match = str.match(regex),
-          parameter = Parameter(match);
+
+      var matches = str.match(regex),
+          parameters = matches.map(Parameter);
+
       return Template(function (context){
-        if(typeof context === "undefined"){
-          context = {};
-        }
-        return str.replace(match[0], context[parameter.key] || parameter.defaultValue);
-      }, [parameter]);
+        context = context || {};
+        return matches.reduce(function (str, match, i){
+          var parameter = parameters[i];
+          var value = context[parameter.key] || parameter.defaultValue;
+          return str.replace(match, value);
+        }, str);
+      }, parameters);
+
     } else {
       return Template(function (){
         return str;
@@ -64,6 +69,30 @@ var parseString = (function (){
     }
   };
 }());
+
+
+// Constructs a parameter object from a match result.
+// e.g. "['{{foo}}']" --> { key: "foo" }
+// e.g. "['{{foo:bar}}']" --> { key: "foo", defaultValue: "bar" }
+function Parameter(match){
+  match = match.substr(2, match.length - 4).trim();
+  var i = match.indexOf(":");
+  if(i !== -1){
+    return {
+      key: match.substr(0, i),
+      defaultValue: match.substr(i + 1)
+    };
+  } else {
+    return { key: match };
+  }
+}
+
+
+// Constructs a template function with `parameters` property.
+function Template(fn, parameters){
+  fn.parameters = parameters;
+  return fn;
+}
 
 
 // Parses non-leaf-nodes in the template object that are objects.
@@ -101,25 +130,4 @@ function parseArray(array){
     return parameters.concat(template.parameters);
   }, []));
 
-}
-
-
-// Constructs a parameter object from a match result.
-// e.g. "['{{foo}}','foo','','',index:0,input:'{{foo}}']" --> { key: "foo" }
-// e.g. "['{{foo:bar}}','foo',':bar','bar',index:0,input:'{{foo:bar}}']" --> { key: "foo", defaultValue: "bar" }
-function Parameter(match){
-  var parameter = { key: match[1] };
-
-  if(match[3] && match[3].length > 0) {
-    parameter.defaultValue = match[3];
-  }
-
-  return parameter;
-}
-
-
-// Constructs a template function with `parameters` property.
-function Template(fn, parameters){
-  fn.parameters = parameters;
-  return fn;
 }
