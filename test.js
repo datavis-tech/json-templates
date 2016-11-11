@@ -76,6 +76,13 @@ describe("json-template", function() {
       assert.equal(template({ firstName: "Jane", lastName: "Doe" }), "Hello Jane Doe, how are you ?");
     });
 
+    it("should handle dashes in defaults", function() {
+      var template = parse("{{startTime:now-24h}}");
+      assert.deepEqual(template.parameters, [{ key: "startTime", defaultValue: "now-24h" }]);
+      assert.equal(template({ startTime: "now-48h"}), "now-48h");
+      assert.equal(template(), "now-24h");
+    });
+
   });
 
 
