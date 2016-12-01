@@ -184,6 +184,26 @@ describe("json-template", function() {
       });
     });
 
+    it("should compute template keys with default value and period in the string", function() {
+
+      var template = parse({
+        body: {
+          "A simple {{message:hello.foo}} to": "{{foo}}"
+        }
+      });
+
+      assert.deepEqual(template.parameters, [
+        { key: "foo" },
+        { key: "message", defaultValue: "hello.foo"}
+      ]);
+
+      assert.deepEqual(template({ foo: "bar" }), {
+        body: {
+          "A simple hello to": "bar"
+        }
+      });
+    });
+
   });
 
 
