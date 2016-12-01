@@ -199,7 +199,7 @@ describe("json-template", function() {
 
       assert.deepEqual(template({ foo: "bar" }), {
         body: {
-          "A simple hello to": "bar"
+          "A simple hello.foo to": "bar"
         }
       });
     });
