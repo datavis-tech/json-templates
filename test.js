@@ -83,6 +83,13 @@ describe("json-template", function() {
       assert.equal(template(), "now-24h");
     });
 
+    it("should handle 'at' symbol in defaults", function() {
+      var template = parse("{{email:jdoe@mail.com}}");
+      assert.deepEqual(template.parameters, [{ key: "email", defaultValue: "jdoe@mail.com" }]);
+      assert.equal(template({ email: "jdoe@mail.com"}), "jdoe@mail.com");
+      assert.equal(template(), "jdoe@mail.com");
+    });
+
   });
 
 
