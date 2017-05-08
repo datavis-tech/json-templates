@@ -20,9 +20,9 @@ describe("json-template", function() {
     });
 
     it("should compute template for a string with a nested object parameter", function() {
-      var template = parse('{{foo.bar:baz}}');
-      assert.deepEqual(template.parameters, [{ key: "foo.bar", defaultValue: 'baz'} ]);
-      assert.equal(template({ foo: { bar: 'message' } }), "message");
+      var template = parse('{{foo.value:baz}}');
+      assert.deepEqual(template.parameters, [{ key: "foo.value", defaultValue: 'baz'} ]);
+      assert.equal(template({ foo: { value: 'bar' } }), "bar");
       assert.equal(template(), "baz");
     });
 
