@@ -3,6 +3,7 @@
 //
 // By Curran Kelleher and Chrostophe Serafin
 // November 2016
+var objectPath = require("object-path");
 
 module.exports = parse;
 
@@ -11,7 +12,7 @@ module.exports = parse;
 //
 // Returns a function `template(context)` that will "fill in" the template
 // with the context object passed to it.
-// 
+//
 // The returned function has a `parameters` property,
 // which is an array of parameter descriptor objects,
 // each of which has a `key` property and possibly a `defaultValue` property.
@@ -57,7 +58,7 @@ var parseString = (function (){
         context = context || {};
         return matches.reduce(function (str, match, i){
           var parameter = parameters[i];
-          var value = context[parameter.key] || parameter.defaultValue;
+          var value = objectPath.get(context, parameter.key) || parameter.defaultValue;
           return str.replace(match, value);
         }, str);
       }, parameters);
