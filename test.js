@@ -90,13 +90,33 @@ describe("json-template", function() {
       assert.equal(template(), "now-24h");
     });
 
-    it("should handle 'at' symbol in defaults", function() {
+    it("should handle special characters in defaults", function() {
+      var template = parse("{{foo:-+., @\/()?=*_}}");
+      assert.deepEqual(template.parameters, [{ key: "foo", defaultValue: "-+., @\/()?=*_" }]);
+      assert.equal(template({ foo: "-+., @\/()?=*_"}), "-+., @\/()?=*_");
+      assert.equal(template(), "-+., @\/()?=*_");
+    });
+
+    it("should handle email address in defaults", function() {
       var template = parse("{{email:jdoe@mail.com}}");
       assert.deepEqual(template.parameters, [{ key: "email", defaultValue: "jdoe@mail.com" }]);
       assert.equal(template({ email: "jdoe@mail.com"}), "jdoe@mail.com");
       assert.equal(template(), "jdoe@mail.com");
     });
 
+    it("should handle phone number in defaults", function() {
+      var template = parse("{{phone:+1 (256) 34-34-4556}}");
+      assert.deepEqual(template.parameters, [{ key: "phone", defaultValue: "+1 (256) 34-34-4556" }]);
+      assert.equal(template({ phone: "+1 (256) 34-34-4556"}), "+1 (256) 34-34-4556");
+      assert.equal(template(), "+1 (256) 34-34-4556");
+    });
+
+    it("should handle url in defaults", function() {
+      var template = parse("{{url:http://www.host.com/path?key_1=value}}");
+      assert.deepEqual(template.parameters, [{ key: "url", defaultValue: "http://www.host.com/path?key_1=value" }]);
+      assert.equal(template({ url: "http://www.host.com/path?key_1=value"}), "http://www.host.com/path?key_1=value");
+      assert.equal(template(), "http://www.host.com/path?key_1=value");
+    });
   });
 
 

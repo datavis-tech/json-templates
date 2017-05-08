@@ -46,7 +46,7 @@ var parseString = (function (){
 
   // This regular expression detects instances of the
   // template parameter syntax such as {{foo}} or {{foo:someDefault}}.
-  var regex = /{{(\w|:|\s|-|\.|@)+}}/g;
+  var regex = /{{(\w|:|[\s-+.,@/\//()?=*_])+}}/g;
 
   return function (str){
     if(regex.test(str)){
