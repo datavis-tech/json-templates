@@ -19,6 +19,13 @@ describe("json-template", function() {
       assert.equal(template({ foo: "bar" }), "bar");
     });
 
+    it("should compute template for a string with a nested object parameter", function() {
+      var template = parse('{{foo.value:baz}}');
+      assert.deepEqual(template.parameters, [{ key: "foo.value", defaultValue: 'baz'} ]);
+      assert.equal(template({ foo: { value: 'bar' } }), "bar");
+      assert.equal(template(), "baz");
+    });
+
     it("should compute template for strings with no parameters", function() {
       [
         "foo",
@@ -149,6 +156,13 @@ describe("json-template", function() {
         description: "bar"
       });
 
+    });
+
+    it("should compute template for an object with a nested object parameter", function() {
+      var template = parse({ a: "{{foo.1:baz}}" });
+      assert.deepEqual(template.parameters, [{ key: "foo.1", defaultValue: 'baz'} ]);
+      assert.deepEqual(template({ foo: ["baq", "bar"] }), { a: "bar" });
+      assert.deepEqual(template(), { a: "baz" });
     });
 
     it("should compute template with nested objects", function() {
