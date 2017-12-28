@@ -205,6 +205,31 @@ describe("json-template", function() {
       });
     });
 
+      describe(" duplication and deduplication ", function(){
+	  var template = parse({
+	      disk: "/project/{{project}}/region/{{region}}/ssd",
+	      vm: "/project/{{project}}/region/{{region}}/cpu"
+	  });
+
+	  it("should correctly fill duplicate references in a template", function(){
+	      assert.deepEqual(template({project: "alpha", region:"us-central"}),
+			       {
+				   disk: "/project/alpha/region/us-central/ssd",
+				   vm: "/project/alpha/region/us-central/cpu"
+			       });
+	  });
+	  
+	  it("should deduplicate template parameters", function(){
+	      assert.deepEqual(template.parameters, [
+		  { key: "project" },
+		  { key: "region" }
+	      ]);
+	  });
+
+      });
+	 
+      
+
     it("should compute template keys with default value", function() {
 
       var template = parse({
