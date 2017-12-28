@@ -3,6 +3,8 @@
 // By Curran Kelleher
 // September 2016
 
+// tests for duplication/deduplication added by Paul Brewer, Economic & Financial Technology Consulting LLC, Dec 2017
+
 var assert = require("assert");
 var parse = require("./index");
 
@@ -206,6 +208,11 @@ describe("json-template", function() {
     });
 
       describe(" duplication and deduplication ", function(){
+
+	  // tested: (i) duplication: if a template uses {{project}} twice, is it set consistently?
+	  //         (ii) deduplication: if a template uses {{project}} twice, does key:"project" appear only once in template.parameters ?
+	  // untested: what to do with {{param:default1}}, {{param:default2}}, and/or {{param}}  in the same template?  is this invalid? do we throw an error? 
+	  
 	  var template = parse({
 	      disk: "/project/{{project}}/region/{{region}}/ssd",
 	      vm: "/project/{{project}}/region/{{region}}/cpu"
