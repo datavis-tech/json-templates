@@ -4,6 +4,7 @@
 // By Curran Kelleher and Chrostophe Serafin
 // November 2016
 var objectPath = require("object-path");
+var dedupe = require("dedupe");
 
 module.exports = parse;
 
@@ -89,9 +90,10 @@ function Parameter(match){
 }
 
 
-// Constructs a template function with `parameters` property.
+// Constructs a template function with deduped `parameters` property.
 function Template(fn, parameters){
-  fn.parameters = parameters;
+    // Paul Brewer Dec 2017 add deduplication call, use only key property to eliminate
+    fn.parameters = dedupe(parameters, function(item){ return item.key });
   return fn;
 }
 
