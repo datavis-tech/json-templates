@@ -504,9 +504,9 @@ describe('json-template', () => {
     });
   });
 
-  // This section tests that the parse function is capable to remplace simple strings, objects and arrays
-  describe('Remplacement functionality', () => {
-    it('should remplace the constiable with the given object without stringify', () => {
+  // This section tests that the parse function is capable to replace simple strings, objects and arrays
+  describe('Replacement functionality', () => {
+    it('should replace the constiable with the given object without stringify', () => {
       const template = parse({
         s: '1',
         b: '{{c.d}}'
@@ -528,7 +528,7 @@ describe('json-template', () => {
       assert.equal(JSON.stringify(template(context)), JSON.stringify(expected));
     });
 
-    it('should remplace the constiable with the given array without stringify', () => {
+    it('should replace the constiable with the given array without stringify', () => {
       const template = parse({
         s: '1',
         b: '{{c.d}}'
