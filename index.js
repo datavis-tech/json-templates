@@ -91,9 +91,7 @@ const parseString = (() => {
           const parameter = parameters[i];
           const value = objectPath.get(context, parameter.key) || parameter.defaultValue;
 
-          if (value === undefined) {
-            return `{{${parameter.key}}}`;
-          } else if (typeof value === 'object') {
+          if (typeof value === 'object') {
             return value;
           }
 

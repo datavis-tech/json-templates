@@ -53,7 +53,7 @@ console.log(template()); // Prints { a: "baz" }, using the default value.
 console.log(template({ foo: ["baq", "bar"] })); // Prints { a: "bar" }, using the given value of array.
 ```
 
-Parameters could be objects and arrays.
+Context values could be objects and arrays.
 
 ```js
 var template = parse("{{foo:baz}}");

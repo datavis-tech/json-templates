@@ -545,23 +545,5 @@ describe('json-template', () => {
       assert.deepEqual(template.parameters, [{ key: 'c.d' }]);
       assert.equal(JSON.stringify(template(context)), JSON.stringify(expected));
     });
-
-    it('should remplace by the key if is not in the context and has no default value', () => {
-      const template = parse({
-        s: '1',
-        b: '{{c.d}}'
-      });
-      const context = {
-        d: {
-          j: 'a'
-        }
-      };
-      const expected = {
-        s: '1',
-        b: '{{c.d}}'
-      };
-      assert.deepEqual(template.parameters, [{ key: 'c.d' }]);
-      assert.equal(JSON.stringify(template(context)), JSON.stringify(expected));
-    });
   });
 });
