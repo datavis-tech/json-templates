@@ -1,8 +1,8 @@
 // json-templates
 // Simple templating within JSON structures.
 //
-// By Curran Kelleher and Chrostophe Serafin
-// November 2016
+// Created by Curran Kelleher and Chrostophe Serafin.
+// Contributions from Paul Brewer and Javier Blanco Martinez.
 const objectPath = require('object-path');
 const dedupe = require('dedupe');
 
