@@ -5,545 +5,545 @@
 
 // tests for duplication/deduplication added by Paul Brewer, Economic & Financial Technology Consulting LLC, Dec 2017
 
-var assert = require("assert");
-var parse = require("./index");
+const assert = require('assert');
+const parse = require('./index');
 
-describe("json-template", function() {
-
+describe('json-template', () => {
   // Handling of strings is the most critical part of the functionality.
   // This section tests the string templating functionality,
   // including default values and edge cases.
-  describe("strings", function() {
-
-    it("should compute template for a string with a single parameter", function() {
-      var template = parse("{{foo}}");
-      assert.deepEqual(template.parameters, [{ key: "foo" }]);
-      assert.equal(template({ foo: "bar" }), "bar");
+  describe('strings', () => {
+    it('should compute template for a string with a single parameter', () => {
+      const template = parse('{{foo}}');
+      assert.deepEqual(template.parameters, [{ key: 'foo' }]);
+      assert.equal(template({ foo: 'bar' }), 'bar');
     });
 
-    it("should compute template for a string with a nested object parameter", function() {
-      var template = parse('{{foo.value:baz}}');
-      assert.deepEqual(template.parameters, [{ key: "foo.value", defaultValue: 'baz'} ]);
-      assert.equal(template({ foo: { value: 'bar' } }), "bar");
-      assert.equal(template(), "baz");
+    it('should compute template for a string with a nested object parameter', () => {
+      const template = parse('{{foo.value:baz}}');
+      assert.deepEqual(template.parameters, [{ key: 'foo.value', defaultValue: 'baz' }]);
+      assert.equal(template({ foo: { value: 'bar' } }), 'bar');
+      assert.equal(template(), 'baz');
     });
 
-    it("should compute template for strings with no parameters", function() {
-      [
-        "foo",
-        "{{}}",
-        "}}{{",
-        "}}foo{{"
-      ].forEach(function (value){
-        var template = parse(value);
+    it('should compute template for strings with no parameters', () => {
+      ['foo', '{{}}', '}}{{', '}}foo{{'].forEach(function(value) {
+        const template = parse(value);
         assert.deepEqual(template.parameters, []);
         assert.equal(template(), value);
       });
     });
 
-    it("should compute template with default for a string", function() {
-      var template = parse("{{foo:bar}}");
+    it('should compute template with default for a string', () => {
+      const template = parse('{{foo:bar}}');
       assert.deepEqual(template.parameters, [
         {
-          key: "foo",
-          defaultValue: "bar"
+          key: 'foo',
+          defaultValue: 'bar'
         }
       ]);
-      assert.equal(template(), "bar");
-      assert.equal(template({ foo: "baz" }), "baz");
-      assert.equal(template({ unknownParam: "baz" }), "bar");
+      assert.equal(template(), 'bar');
+      assert.equal(template({ foo: 'baz' }), 'baz');
+      assert.equal(template({ unknownParam: 'baz' }), 'bar');
     });
 
-    it("should compute template with default for a string with multiple colons", function() {
-      var template = parse("{{foo:bar:baz}}");
+    it('should compute template with default for a string with multiple colons', () => {
+      const template = parse('{{foo:bar:baz}}');
       assert.deepEqual(template.parameters, [
         {
-          key: "foo",
-          defaultValue: "bar:baz"
+          key: 'foo',
+          defaultValue: 'bar:baz'
         }
       ]);
-      assert.equal(template(), "bar:baz");
-      assert.equal(template({ foo: "baz" }), "baz");
-      assert.equal(template({ unknownParam: "baz" }), "bar:baz");
+      assert.equal(template(), 'bar:baz');
+      assert.equal(template({ foo: 'baz' }), 'baz');
+      assert.equal(template({ unknownParam: 'baz' }), 'bar:baz');
     });
 
-    it("should compute template for a string with inner parameter", function() {
-      var template = parse("Hello {{foo}}, how are you ?");
-      assert.deepEqual(template.parameters, [{ key: "foo" }]);
-      assert.equal(template({ foo: "john" }), "Hello john, how are you ?");
+    it('should compute template for a string with inner parameter', () => {
+      const template = parse('Hello {{foo}}, how are you ?');
+      assert.deepEqual(template.parameters, [{ key: 'foo' }]);
+      assert.equal(template({ foo: 'john' }), 'Hello john, how are you ?');
     });
 
-    it("should compute template for a string with multiple inner parameters", function() {
-      var template = parse("Hello {{firstName}} {{lastName}}, how are you ?");
-      assert.deepEqual(template.parameters, [{ key: "firstName" }, { key: "lastName" }]);
-      assert.equal(template({ firstName: "Jane", lastName: "Doe" }), "Hello Jane Doe, how are you ?");
+    it('should compute template for a string with multiple inner parameters', () => {
+      const template = parse('Hello {{firstName}} {{lastName}}, how are you ?');
+      assert.deepEqual(template.parameters, [{ key: 'firstName' }, { key: 'lastName' }]);
+      assert.equal(
+        template({ firstName: 'Jane', lastName: 'Doe' }),
+        'Hello Jane Doe, how are you ?'
+      );
     });
 
-    it("should handle extra whitespace", function() {
-      var template = parse("Hello {{firstName }} {{ lastName}}, how are you ?");
-      assert.deepEqual(template.parameters, [{ key: "firstName" }, { key: "lastName" }]);
-      assert.equal(template({ firstName: "Jane", lastName: "Doe" }), "Hello Jane Doe, how are you ?");
+    it('should handle extra whitespace', () => {
+      const template = parse('Hello {{firstName }} {{ lastName}}, how are you ?');
+      assert.deepEqual(template.parameters, [{ key: 'firstName' }, { key: 'lastName' }]);
+      assert.equal(
+        template({ firstName: 'Jane', lastName: 'Doe' }),
+        'Hello Jane Doe, how are you ?'
+      );
     });
 
-    it("should handle dashes in defaults", function() {
-      var template = parse("{{startTime:now-24h}}");
-      assert.deepEqual(template.parameters, [{ key: "startTime", defaultValue: "now-24h" }]);
-      assert.equal(template({ startTime: "now-48h"}), "now-48h");
-      assert.equal(template(), "now-24h");
+    it('should handle dashes in defaults', () => {
+      const template = parse('{{startTime:now-24h}}');
+      assert.deepEqual(template.parameters, [{ key: 'startTime', defaultValue: 'now-24h' }]);
+      assert.equal(template({ startTime: 'now-48h' }), 'now-48h');
+      assert.equal(template(), 'now-24h');
     });
 
-    it("should handle special characters in defaults", function() {
-      var template = parse("{{foo:-+., @\/()?=*_}}");
-      assert.deepEqual(template.parameters, [{ key: "foo", defaultValue: "-+., @\/()?=*_" }]);
-      assert.equal(template({ foo: "-+., @\/()?=*_"}), "-+., @\/()?=*_");
-      assert.equal(template(), "-+., @\/()?=*_");
+    it('should handle special characters in defaults', () => {
+      const template = parse('{{foo:-+., @\/()?=*_}}');
+      assert.deepEqual(template.parameters, [{ key: 'foo', defaultValue: '-+., @\/()?=*_' }]);
+      assert.equal(template({ foo: '-+., @\/()?=*_' }), '-+., @\/()?=*_');
+      assert.equal(template(), '-+., @\/()?=*_');
     });
 
-    it("should handle email address in defaults", function() {
-      var template = parse("{{email:jdoe@mail.com}}");
-      assert.deepEqual(template.parameters, [{ key: "email", defaultValue: "jdoe@mail.com" }]);
-      assert.equal(template({ email: "jdoe@mail.com"}), "jdoe@mail.com");
-      assert.equal(template(), "jdoe@mail.com");
+    it('should handle email address in defaults', () => {
+      const template = parse('{{email:jdoe@mail.com}}');
+      assert.deepEqual(template.parameters, [{ key: 'email', defaultValue: 'jdoe@mail.com' }]);
+      assert.equal(template({ email: 'jdoe@mail.com' }), 'jdoe@mail.com');
+      assert.equal(template(), 'jdoe@mail.com');
     });
 
-    it("should handle phone number in defaults", function() {
-      var template = parse("{{phone:+1 (256) 34-34-4556}}");
-      assert.deepEqual(template.parameters, [{ key: "phone", defaultValue: "+1 (256) 34-34-4556" }]);
-      assert.equal(template({ phone: "+1 (256) 34-34-4556"}), "+1 (256) 34-34-4556");
-      assert.equal(template(), "+1 (256) 34-34-4556");
+    it('should handle phone number in defaults', () => {
+      const template = parse('{{phone:+1 (256) 34-34-4556}}');
+      assert.deepEqual(template.parameters, [
+        { key: 'phone', defaultValue: '+1 (256) 34-34-4556' }
+      ]);
+      assert.equal(template({ phone: '+1 (256) 34-34-4556' }), '+1 (256) 34-34-4556');
+      assert.equal(template(), '+1 (256) 34-34-4556');
     });
 
-    it("should handle url in defaults", function() {
-      var template = parse("{{url:http://www.host.com/path?key_1=value}}");
-      assert.deepEqual(template.parameters, [{ key: "url", defaultValue: "http://www.host.com/path?key_1=value" }]);
-      assert.equal(template({ url: "http://www.host.com/path?key_1=value"}), "http://www.host.com/path?key_1=value");
-      assert.equal(template(), "http://www.host.com/path?key_1=value");
+    it('should handle url in defaults', () => {
+      const template = parse('{{url:http://www.host.com/path?key_1=value}}');
+      assert.deepEqual(template.parameters, [
+        { key: 'url', defaultValue: 'http://www.host.com/path?key_1=value' }
+      ]);
+      assert.equal(
+        template({ url: 'http://www.host.com/path?key_1=value' }),
+        'http://www.host.com/path?key_1=value'
+      );
+      assert.equal(template(), 'http://www.host.com/path?key_1=value');
     });
   });
-
 
   // This section tests that the parse function recursively
   // traverses objects, and applies the string templating correctly.
-  describe("objects", function() {
-
-    it("should compute template with an object that has inner parameter", function() {
-      var template = parse({ title: "Hello {{foo}}, how are you ?" });
-      assert.deepEqual(template.parameters, [{ key: "foo" }]);
-      assert.deepEqual(template({ foo: "john" }), { title: "Hello john, how are you ?" });
+  describe('objects', () => {
+    it('should compute template with an object that has inner parameter', () => {
+      const template = parse({ title: 'Hello {{foo}}, how are you ?' });
+      assert.deepEqual(template.parameters, [{ key: 'foo' }]);
+      assert.deepEqual(template({ foo: 'john' }), { title: 'Hello john, how are you ?' });
     });
 
-    it("should compute template with an object", function() {
-      var template = parse({ title: "{{foo}}" });
-      assert.deepEqual(template.parameters, [{ key: "foo" }]);
-      assert.deepEqual(template({ foo: "bar" }), { title: "bar" });
+    it('should compute template with an object', () => {
+      const template = parse({ title: '{{foo}}' });
+      assert.deepEqual(template.parameters, [{ key: 'foo' }]);
+      assert.deepEqual(template({ foo: 'bar' }), { title: 'bar' });
     });
 
-    it("should compute template with an object with multiple parameters", function() {
-
-      var template = parse({
-        title: "{{myTitle}}",
-        description: "{{myDescription}}"
+    it('should compute template with an object with multiple parameters', () => {
+      const template = parse({
+        title: '{{myTitle}}',
+        description: '{{myDescription}}'
       });
 
-      assert.deepEqual(template.parameters, [
-        { key: "myTitle" },
-        { key: "myDescription"}
-      ]);
+      assert.deepEqual(template.parameters, [{ key: 'myTitle' }, { key: 'myDescription' }]);
 
-      assert.deepEqual(template({
-        myTitle: "foo",
-        myDescription: "bar"
-      }), {
-        title: "foo",
-        description: "bar"
-      });
-
+      assert.deepEqual(
+        template({
+          myTitle: 'foo',
+          myDescription: 'bar'
+        }),
+        {
+          title: 'foo',
+          description: 'bar'
+        }
+      );
     });
 
-    it("should compute template for an object with a nested object parameter", function() {
-      var template = parse({ a: "{{foo.1:baz}}" });
-      assert.deepEqual(template.parameters, [{ key: "foo.1", defaultValue: 'baz'} ]);
-      assert.deepEqual(template({ foo: ["baq", "bar"] }), { a: "bar" });
-      assert.deepEqual(template(), { a: "baz" });
+    it('should compute template for an object with a nested object parameter', () => {
+      const template = parse({ a: '{{foo.1:baz}}' });
+      assert.deepEqual(template.parameters, [{ key: 'foo.1', defaultValue: 'baz' }]);
+      assert.deepEqual(template({ foo: ['baq', 'bar'] }), { a: 'bar' });
+      assert.deepEqual(template(), { a: 'baz' });
     });
 
-    it("should compute template with nested objects", function() {
-
-      var template = parse({
+    it('should compute template with nested objects', () => {
+      const template = parse({
         body: {
-          title: "{{foo}}"
+          title: '{{foo}}'
+        }
+      });
+
+      assert.deepEqual(template.parameters, [{ key: 'foo' }]);
+
+      assert.deepEqual(template({ foo: 'bar' }), {
+        body: {
+          title: 'bar'
+        }
+      });
+    });
+
+    it('should compute template keys', () => {
+      const template = parse({
+        body: {
+          'A simple {{message}} to': '{{foo}}'
+        }
+      });
+
+      assert.deepEqual(template.parameters, [{ key: 'foo' }, { key: 'message' }]);
+
+      assert.deepEqual(template({ foo: 'bar', message: 'hello' }), {
+        body: {
+          'A simple hello to': 'bar'
+        }
+      });
+    });
+
+    describe('duplication and deduplication', () => {
+      // tested: (i) duplication: if a template uses {{project}} twice, is it set consistently?
+      //         (ii) deduplication: if a template uses {{project}} twice, does key:"project" appear only once in template.parameters ?
+      // untested: what to do with {{param:default1}}, {{param:default2}}, and/or {{param}}  in the same template?  is this invalid? do we throw an error?
+
+      const template = parse({
+        disk: '/project/{{project}}/region/{{region}}/ssd',
+        vm: '/project/{{project}}/region/{{region}}/cpu'
+      });
+
+      it('should correctly fill duplicate references in a template', () => {
+        assert.deepEqual(template({ project: 'alpha', region: 'us-central' }), {
+          disk: '/project/alpha/region/us-central/ssd',
+          vm: '/project/alpha/region/us-central/cpu'
+        });
+      });
+
+      it('should deduplicate template parameters', () => {
+        assert.deepEqual(template.parameters, [{ key: 'project' }, { key: 'region' }]);
+      });
+    });
+
+    it('should compute template keys with default value', () => {
+      const template = parse({
+        body: {
+          'A simple {{message:hello}} to': '{{foo}}'
         }
       });
 
       assert.deepEqual(template.parameters, [
-        { key: "foo" }
+        { key: 'foo' },
+        { key: 'message', defaultValue: 'hello' }
       ]);
 
-      assert.deepEqual(template({ foo: "bar" }), {
+      assert.deepEqual(template({ foo: 'bar' }), {
         body: {
-          title: "bar"
+          'A simple hello to': 'bar'
         }
       });
-
     });
 
-    it("should compute template keys", function() {
-
-      var template = parse({
+    it('should compute template keys with default value and period in the string', () => {
+      const template = parse({
         body: {
-          "A simple {{message}} to": "{{foo}}"
+          'A simple {{message:hello.foo}} to': '{{foo}}'
         }
       });
 
       assert.deepEqual(template.parameters, [
-        { key: "foo" },
-        { key: "message"}
+        { key: 'foo' },
+        { key: 'message', defaultValue: 'hello.foo' }
       ]);
 
-      assert.deepEqual(template({ foo: "bar", message: "hello" }), {
+      assert.deepEqual(template({ foo: 'bar' }), {
         body: {
-          "A simple hello to": "bar"
+          'A simple hello.foo to': 'bar'
         }
       });
     });
-
-      describe(" duplication and deduplication ", function(){
-
-	  // tested: (i) duplication: if a template uses {{project}} twice, is it set consistently?
-	  //         (ii) deduplication: if a template uses {{project}} twice, does key:"project" appear only once in template.parameters ?
-	  // untested: what to do with {{param:default1}}, {{param:default2}}, and/or {{param}}  in the same template?  is this invalid? do we throw an error? 
-	  
-	  var template = parse({
-	      disk: "/project/{{project}}/region/{{region}}/ssd",
-	      vm: "/project/{{project}}/region/{{region}}/cpu"
-	  });
-
-	  it("should correctly fill duplicate references in a template", function(){
-	      assert.deepEqual(template({project: "alpha", region:"us-central"}),
-			       {
-				   disk: "/project/alpha/region/us-central/ssd",
-				   vm: "/project/alpha/region/us-central/cpu"
-			       });
-	  });
-	  
-	  it("should deduplicate template parameters", function(){
-	      assert.deepEqual(template.parameters, [
-		  { key: "project" },
-		  { key: "region" }
-	      ]);
-	  });
-
-      });
-	 
-      
-
-    it("should compute template keys with default value", function() {
-
-      var template = parse({
-        body: {
-          "A simple {{message:hello}} to": "{{foo}}"
-        }
-      });
-
-      assert.deepEqual(template.parameters, [
-        { key: "foo" },
-        { key: "message", defaultValue: "hello"}
-      ]);
-
-      assert.deepEqual(template({ foo: "bar" }), {
-        body: {
-          "A simple hello to": "bar"
-        }
-      });
-    });
-
-    it("should compute template keys with default value and period in the string", function() {
-
-      var template = parse({
-        body: {
-          "A simple {{message:hello.foo}} to": "{{foo}}"
-        }
-      });
-
-      assert.deepEqual(template.parameters, [
-        { key: "foo" },
-        { key: "message", defaultValue: "hello.foo"}
-      ]);
-
-      assert.deepEqual(template({ foo: "bar" }), {
-        body: {
-          "A simple hello.foo to": "bar"
-        }
-      });
-    });
-
   });
-
 
   // This section tests that the parse function recursively
   // traverses arrays, and applies the string templating correctly.
-  describe("arrays", function() {
-
-    it("should compute template with an array", function() {
-      var template = parse(["{{foo}}"]);
-      assert.deepEqual(template.parameters, [{ key: "foo" }]);
-      assert.equal(
-        JSON.stringify(template({ foo: "bar" })),
-        '["bar"]'
-      );
+  describe('arrays', () => {
+    it('should compute template with an array', () => {
+      const template = parse(['{{foo}}']);
+      assert.deepEqual(template.parameters, [{ key: 'foo' }]);
+      assert.equal(JSON.stringify(template({ foo: 'bar' })), '["bar"]');
     });
 
-    it("should compute template with a nested array", function() {
-      var template = parse([["{{foo}}"]]);
-      assert.deepEqual(template.parameters, [{ key: "foo" }]);
-      assert.equal(
-        JSON.stringify(template({ foo: "bar" })),
-        '[["bar"]]'
-      );
+    it('should compute template with a nested array', () => {
+      const template = parse([['{{foo}}']]);
+      assert.deepEqual(template.parameters, [{ key: 'foo' }]);
+      assert.equal(JSON.stringify(template({ foo: 'bar' })), '[["bar"]]');
     });
-
   });
-
 
   // This section tests that arbitrary types may be present
   // as leaf nodes of the object tree, and they are handled correctly.
-  describe("unknown types", function() {
-
-    it("should compute template with numbers", function() {
-      var template = parse(1);
+  describe('unknown types', () => {
+    it('should compute template with numbers', () => {
+      const template = parse(1);
       assert.deepEqual(template.parameters, []);
       assert.equal(template(), 1);
     });
 
-    it("should compute template with booleans", function() {
-      var template = parse(true);
+    it('should compute template with booleans', () => {
+      const template = parse(true);
       assert.deepEqual(template.parameters, []);
       assert.equal(template(), true);
     });
 
-    it("should compute template with dates", function() {
-      var value = new Date();
-      var template = parse(value);
+    it('should compute template with dates', () => {
+      const value = new Date();
+      const template = parse(value);
       assert.deepEqual(template.parameters, []);
       assert.equal(template(), value);
     });
 
-    it("should compute template with functions", function() {
-      var value = function (){ return "foo"; };
-      var template = parse(value);
+    it('should compute template with functions', () => {
+      const value = () => {
+        return 'foo';
+      };
+      const template = parse(value);
       assert.deepEqual(template.parameters, []);
       assert.equal(template(), value);
     });
-
   });
 
   // This section tests for our main use case of this library - ElasticSearch queries.
   // These examples demonstrate that the templating works for complex object structures
   // that we will encounter when using the templating functionality with ElasticSearch.
-  describe("mixed data structures", function() {
-
-    it("should compute template with ElasticSearch query", function() {
-
+  describe('mixed data structures', () => {
+    it('should compute template with ElasticSearch query', () => {
       // Query example from https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/api-reference.html#api-search
-      var template = parse({
-        index: "myindex",
+      const template = parse({
+        index: 'myindex',
         body: {
           query: {
             match: {
-              title: "{{title}}"
+              title: '{{title}}'
             }
           },
           facets: {
             tags: {
               terms: {
-                field: "tags"
+                field: 'tags'
               }
             }
           }
         }
       });
 
-      assert.deepEqual(template.parameters, [{ key: "title" }]);
+      assert.deepEqual(template.parameters, [{ key: 'title' }]);
 
-      assert.deepEqual(
-        template({ title: "test" }),
-        {
-          index: "myindex",
-          body: {
-            query: {
-              match: {
-                title: "test"
-              }
-            },
-            facets: {
-              tags: {
-                terms: {
-                  field: "tags"
-                }
-              }
-            }
-          }
-        }
-      );
-    });
-
-    it("should compute template with ElasticSearch query including default value", function() {
-
-      var template = parse({
-        index: "myindex",
+      assert.deepEqual(template({ title: 'test' }), {
+        index: 'myindex',
         body: {
           query: {
             match: {
-              title: "{{title:test}}"
+              title: 'test'
             }
           },
           facets: {
             tags: {
               terms: {
-                field: "tags"
+                field: 'tags'
               }
             }
           }
         }
       });
-
-      assert.deepEqual(template.parameters, [{
-        key: "title",
-        defaultValue: "test"
-      }]);
-
-      assert.deepEqual(
-        template(),
-        {
-          index: "myindex",
-          body: {
-            query: {
-              match: {
-                title: "test"
-              }
-            },
-            facets: {
-              tags: {
-                terms: {
-                  field: "tags"
-                }
-              }
-            }
-          }
-        }
-      );
-
-      assert.deepEqual(
-        template({ title: "foo" }),
-        {
-          index: "myindex",
-          body: {
-            query: {
-              match: {
-                title: "foo"
-              }
-            },
-            facets: {
-              tags: {
-                terms: {
-                  field: "tags"
-                }
-              }
-            }
-          }
-        }
-      );
     });
 
-    it("should compute template with ElasticSearch query including arrays", function() {
-
-      // Query example from https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-bool-query.html
-      var template = parse({
-        "bool": {
-          "must": {
-            "term": {
-              "user": "kimchy"
+    it('should compute template with ElasticSearch query including default value', () => {
+      const template = parse({
+        index: 'myindex',
+        body: {
+          query: {
+            match: {
+              title: '{{title:test}}'
             }
           },
-          "filter": {
-            "term": {
-              "tag": "tech"
-            }
-          },
-          "must_not": {
-            "range": {
-              "age": {
-                "from": 10,
-                "to": 20
+          facets: {
+            tags: {
+              terms: {
+                field: 'tags'
               }
             }
-          },
-          "should": [
-            {
-              "term": {
-                "tag": "{{myTag1}}"
-              }
-            },
-            {
-              "term": {
-                "tag": "{{myTag2}}"
-              }
-            }
-          ],
-          "minimum_should_match": 1,
-          "boost": 1
+          }
         }
       });
 
       assert.deepEqual(template.parameters, [
-        { key: "myTag1" },
-        { key: "myTag2" }
+        {
+          key: 'title',
+          defaultValue: 'test'
+        }
       ]);
+
+      assert.deepEqual(template(), {
+        index: 'myindex',
+        body: {
+          query: {
+            match: {
+              title: 'test'
+            }
+          },
+          facets: {
+            tags: {
+              terms: {
+                field: 'tags'
+              }
+            }
+          }
+        }
+      });
+
+      assert.deepEqual(template({ title: 'foo' }), {
+        index: 'myindex',
+        body: {
+          query: {
+            match: {
+              title: 'foo'
+            }
+          },
+          facets: {
+            tags: {
+              terms: {
+                field: 'tags'
+              }
+            }
+          }
+        }
+      });
+    });
+
+    it('should compute template with ElasticSearch query including arrays', () => {
+      // Query example from https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-bool-query.html
+      const template = parse({
+        bool: {
+          must: {
+            term: {
+              user: 'kimchy'
+            }
+          },
+          filter: {
+            term: {
+              tag: 'tech'
+            }
+          },
+          must_not: {
+            range: {
+              age: {
+                from: 10,
+                to: 20
+              }
+            }
+          },
+          should: [
+            {
+              term: {
+                tag: '{{myTag1}}'
+              }
+            },
+            {
+              term: {
+                tag: '{{myTag2}}'
+              }
+            }
+          ],
+          minimum_should_match: 1,
+          boost: 1
+        }
+      });
+
+      assert.deepEqual(template.parameters, [{ key: 'myTag1' }, { key: 'myTag2' }]);
 
       assert.deepEqual(
         template({
-          myTag1: "wow",
-          myTag2: "cats",
+          myTag1: 'wow',
+          myTag2: 'cats'
         }),
         {
-          "bool": {
-            "must": {
-              "term": {
-                "user": "kimchy"
+          bool: {
+            must: {
+              term: {
+                user: 'kimchy'
               }
             },
-            "filter": {
-              "term": {
-                "tag": "tech"
+            filter: {
+              term: {
+                tag: 'tech'
               }
             },
-            "must_not": {
-              "range": {
-                "age": {
-                  "from": 10,
-                  "to": 20
+            must_not: {
+              range: {
+                age: {
+                  from: 10,
+                  to: 20
                 }
               }
             },
-            "should": [
+            should: [
               {
-                "term": {
-                  "tag": "wow"
+                term: {
+                  tag: 'wow'
                 }
               },
               {
-                "term": {
-                  "tag": "cats"
+                term: {
+                  tag: 'cats'
                 }
               }
             ],
-            "minimum_should_match": 1,
-            "boost": 1
+            minimum_should_match: 1,
+            boost: 1
           }
         }
       );
+    });
+  });
 
+  // This section tests that the parse function is capable to replace simple strings, objects and arrays
+  describe('Replacement functionality', () => {
+    it('should replace the constiable with the given object without stringify', () => {
+      const template = parse({
+        s: '1',
+        b: '{{c.d}}'
+      });
+      const context = {
+        c: {
+          d: {
+            j: 'a'
+          }
+        }
+      };
+      const expected = {
+        s: '1',
+        b: {
+          j: 'a'
+        }
+      };
+      assert.deepEqual(template.parameters, [{ key: 'c.d' }]);
+      assert.equal(JSON.stringify(template(context)), JSON.stringify(expected));
     });
 
+    it('should replace the constiable with the given array without stringify', () => {
+      const template = parse({
+        s: '1',
+        b: '{{c.d}}'
+      });
+      const context = {
+        c: {
+          d: ['a', 'b', 'c']
+        }
+      };
+      const expected = {
+        s: '1',
+        b: ['a', 'b', 'c']
+      };
+      assert.deepEqual(template.parameters, [{ key: 'c.d' }]);
+      assert.equal(JSON.stringify(template(context)), JSON.stringify(expected));
+    });
   });
 });

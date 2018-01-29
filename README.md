@@ -53,6 +53,18 @@ console.log(template()); // Prints { a: "baz" }, using the default value.
 console.log(template({ foo: ["baq", "bar"] })); // Prints { a: "bar" }, using the given value of array.
 ```
 
+Context values could be objects and arrays.
+
+```js
+var template = parse("{{foo:baz}}");
+
+console.log(template.parameters); // Prints [{ key: "foo", defaultValue: "baz" }]
+
+console.log(template()); // Prints "baz", using the default value.
+
+console.log(template({ foo: { value: 'bar' } })); // Prints { value: 'bar' } , using the given value.
+
+```
 The kind of templating you can see in the above examples gets applied to any string values in complex object structures such as ElasticSearch queries. Here's an example of an ElasticSearch query.
 
 ```js
