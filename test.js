@@ -92,10 +92,10 @@ describe('json-template', () => {
     });
 
     it('should handle special characters in defaults', () => {
-      const template = parse('{{foo:-+., @\/()?=*_}}');
-      assert.deepEqual(template.parameters, [{ key: 'foo', defaultValue: '-+., @\/()?=*_' }]);
-      assert.equal(template({ foo: '-+., @\/()?=*_' }), '-+., @\/()?=*_');
-      assert.equal(template(), '-+., @\/()?=*_');
+      const template = parse('{{foo:-+., @/()?=*_}}');
+      assert.deepEqual(template.parameters, [{ key: 'foo', defaultValue: '-+., @/()?=*_' }]);
+      assert.equal(template({ foo: '-+., @/()?=*_' }), '-+., @/()?=*_');
+      assert.equal(template(), '-+., @/()?=*_');
     });
 
     it('should handle email address in defaults', () => {
@@ -544,6 +544,19 @@ describe('json-template', () => {
       };
       assert.deepEqual(template.parameters, [{ key: 'c.d' }]);
       assert.equal(JSON.stringify(template(context)), JSON.stringify(expected));
+    });
+  });
+
+  // This section tests that if the match is not found the template should be replaced by null
+  describe('no match on the given context', () => {
+    it('should replace the given template by null if no match found for an string', () => {
+      const template = parse('{{foo}}');
+      assert.equal(template({}), null);
+    });
+
+    it('should replace the given template by null if no match found for an object', () => {
+      const template = parse({ boo: '{{foo}}' });
+      assert.deepEqual(template({}), { boo: null });
     });
   });
 });
