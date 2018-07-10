@@ -558,5 +558,10 @@ describe('json-template', () => {
       const template = parse({ boo: '{{foo}}' });
       assert.deepEqual(template({}), { boo: null });
     });
+
+    it('should replace the given template by null if the found value is null', () => {
+      const template = parse({ boo: '{{foo}}' });
+      assert.deepEqual(template({ foo: null }), { boo: null });
+    });
   });
 });
