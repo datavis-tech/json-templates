@@ -95,6 +95,10 @@ const parseString = (() => {
             return value;
           }
 
+          if (value === undefined || value === null) {
+            return null;
+          }
+
           return str.replace(match, value);
         }, str);
       };
