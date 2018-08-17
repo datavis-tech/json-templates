@@ -118,7 +118,7 @@ The parse function also handles nested arrays and arbitrary leaf values. For mor
 
 ## Why?
 
-The use case for this came about while working with ElasticSearch queries that need to be parameterized. We wanted the ability to *speficy query templates within JSON*, and also make any of the string values parameterizable. The ideas was to make something kind of like [Handlebars](http://handlebarsjs.com/), but just for the values within the query.
+The use case for this came about while working with ElasticSearch queries that need to be parameterized. We wanted the ability to *specify query templates within JSON*, and also make any of the string values parameterizable. The ideas was to make something kind of like [Handlebars](http://handlebarsjs.com/), but just for the values within the query.
 
 We also needed to know which parameters are required to "fill in" a given query template (in order to check if we have the right context parameters to actually execute the query). Related to this requirement, sometimes certain parameters should have default values. These parameters are not strictly required from the context. If not specified, the default value from the template will be used, otherwise the value from the context will be used.
 
