@@ -260,6 +260,16 @@ describe('json-template', () => {
         }
       });
     });
+
+    it('should allow template with null leaf values', () => {
+      const spec = {
+        x: '{{foo}}',
+        y: null
+      };
+      const template = parse(spec);
+      assert.deepEqual(template.parameters, [{ key: 'foo' }]);
+      assert.deepEqual(template({ foo: 'bar' }), { x: 'bar', y: null });
+    });
   });
 
   // This section tests that the parse function recursively

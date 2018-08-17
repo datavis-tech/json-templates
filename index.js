@@ -13,6 +13,8 @@ function type(value) {
     valueType = 'array';
   } else if (value instanceof Date) {
     valueType = 'date';
+  } else if (value === null) {
+    valueType = 'null';
   }
 
   return valueType;
