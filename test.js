@@ -6,7 +6,7 @@
 // tests for duplication/deduplication added by Paul Brewer, Economic & Financial Technology Consulting LLC, Dec 2017
 
 const assert = require('assert');
-const parse = require('./index');
+const parse = require('./dist');
 
 describe('json-template', () => {
   // Handling of strings is the most critical part of the functionality.

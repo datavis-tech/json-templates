@@ -4,7 +4,7 @@ export default {
   input: 'index.js',
   output: {
     format: 'umd',
-    name: 'JSON templates',
+    name: 'jsonTemplates',
     file: 'dist/index.js'
   },
   plugins: [

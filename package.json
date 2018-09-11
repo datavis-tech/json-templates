@@ -1,11 +1,14 @@
 {
   "name": "json-templates",
-  "version": "2.3.0",
+  "version": "2.2.0",
   "description": "Simple JSON value templating.",
   "main": "dist/index.js",
   "scripts": {
     "build": "rollup -c",
-    "test": "mocha"
+    "pretest": "npm run build",
+    "test": "mocha",
+    "prepublishOnly": "npm test",
+    "postpublish": "git push && git push --tags"
   },
   "repository": {
     "type": "git",
