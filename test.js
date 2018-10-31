@@ -125,6 +125,11 @@ describe('json-template', () => {
       );
       assert.equal(template(), 'http://www.host.com/path?key_1=value');
     });
+
+    it('should handle empty strings for parameter value', () => {
+      const template = parse('{{foo}}');
+      assert.equal(template({ foo: '' }), '');
+    });
   });
 
   // This section tests that the parse function recursively
