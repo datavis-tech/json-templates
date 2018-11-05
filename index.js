@@ -91,7 +91,7 @@ const parseString = (() => {
         context = context || {};
         return matches.reduce((str, match, i) => {
           const parameter = parameters[i];
-          let value = objectPath.get(context, parameter.key)
+          let value = objectPath.get(context, parameter.key);
           if (value === undefined) {
             value = parameter.defaultValue;
           }
