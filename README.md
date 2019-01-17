@@ -10,6 +10,9 @@ Here's how you can use this library. Begin by installing via NPM:
 
 Here's a small example of usage showing the simplest case, a single string.
 
+
+
+
 ```js
 var parse = require("json-templates");
 
@@ -111,6 +114,21 @@ The last line prints the following structure:
     }
   }
 }
+```
+
+
+Add regex parameters in parse function, if you want to change bracket recognition
+regexLength = length of backets in this example = 3 ({{{)
+
+```js
+var template = parse("{{foo:baz}}", {regex : '/{{{(\w|:|[\s-+.,@/\//()?=*_])+}}}/g', regexLength : 3}});
+
+console.log(template.parameters); // Prints [{ key: "foo", defaultValue: "baz" }]
+
+console.log(template()); // Prints "baz", using the default value.
+
+console.log(template({ foo: { value: 'bar' } })); // Prints { value: 'bar' } , using the given value.
+
 ```
 
 The parse function also handles nested arrays and arbitrary leaf values. For more detailed examples, check out the [tests](https://github.com/curran/json-templates/blob/master/test.js).
