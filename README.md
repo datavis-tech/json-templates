@@ -20,7 +20,7 @@ console.log(template.parameters); // Prints [{ key: "foo" }]
 console.log(template({ foo: "bar" })); // Prints "bar"
 ```
 
-Parameters can have default values, specified using a colon.
+Parameters can have default values, specified using a colon. These come into play when the parameter is either `undefined` or `null`.
 
 ```js
 var template = parse("{{foo:bar}}");
