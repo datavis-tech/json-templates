@@ -578,5 +578,10 @@ describe('json-template', () => {
       const template = parse({ boo: '{{foo}}' });
       assert.deepEqual(template({ foo: null }), { boo: null });
     });
+
+    it('should handle multi-value expressions where the first value is null, but has a defaultValue', () => {
+      const template = parse({ boo: '{{foo.isNull:defaultValue}} {{foo.isNonNull}}' });
+      assert.deepEqual(template({ foo: { isNull: null, isNonNull: 'value' } }), { boo: 'defaultValue value' });
+    });
   });
 });
