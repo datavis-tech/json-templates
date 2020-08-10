@@ -78,7 +78,7 @@ function parse(value) {
 const parseString = (() => {
   // This regular expression detects instances of the
   // template parameter syntax such as {{foo}} or {{foo:someDefault}}.
-  const regex = /{{(\w|:|[\s-+.,@/\//()?=*_])+}}/g;
+  const regex = /{{(\w|:|[\s-+.,@/\//()?=*_$])+}}/g;
 
   return str => {
     let parameters = [];
