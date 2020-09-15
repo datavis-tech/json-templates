@@ -104,6 +104,11 @@ const parseString = (() => {
             return null;
           }
 
+          // Accommodate numbers as values.
+          if (matches.length === 1 && str.startsWith('{{') && str.endsWith('}}')) {
+            return value;
+          }
+
           return str.replace(match, value);
         }, str);
       };
