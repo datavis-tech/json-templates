@@ -147,6 +147,12 @@ describe('json-template', () => {
       assert.deepEqual(template({ foo: 'bar' }), { title: 'bar' });
     });
 
+    it('should use a number as a value', () => {
+      const template = parse({ title: '{{foo}}' });
+      assert.deepEqual(template.parameters, [{ key: 'foo' }]);
+      assert.deepEqual(JSON.stringify(template({ foo: 5 })), '{"title":5}');
+    });
+
     it('should compute template with an object with multiple parameters', () => {
       const template = parse({
         title: '{{myTitle}}',
