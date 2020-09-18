@@ -11,9 +11,9 @@ Here's how you can use this library. Begin by installing via NPM:
 Here's a small example of usage showing the simplest case, a single string.
 
 ```js
-var parse = require("json-templates");
+const parse = require("json-templates");
 
-var template = parse("{{foo}}");
+const template = parse("{{foo}}");
 
 console.log(template.parameters); // Prints [{ key: "foo" }]
 
@@ -23,7 +23,7 @@ console.log(template({ foo: "bar" })); // Prints "bar"
 Parameters can have default values, specified using a colon. These come into play when the parameter is either `undefined` or `null`.
 
 ```js
-var template = parse("{{foo:bar}}");
+const template = parse("{{foo:bar}}");
 
 console.log(template.parameters); // Prints [{ key: "foo", defaultValue: "bar" }]
 
@@ -35,7 +35,7 @@ console.log(template({ foo: "baz" })); // Prints "baz", using the given value.
 Parameters can come from a nested object.
 
 ```js
-var template = parse("{{foo.value:baz}}");
+const template = parse("{{foo.value:baz}}");
 
 console.log(template.parameters); // Prints [{ key: "foo.value", defaultValue: "baz" }]
 
@@ -44,7 +44,7 @@ console.log(template()); // Prints "baz", using the default value.
 console.log(template({ foo: { value: 'bar' } })); // Prints "bar", using the given value.
 
 // Example with parameter coming from array
-var template = parse({ a: "{{foo.1:baz}}" });
+const template = parse({ a: "{{foo.1:baz}}" });
 
 console.log(template.parameters); // Prints [{ key: "foo.1", defaultValue: "baz" }]
 
@@ -56,7 +56,7 @@ console.log(template({ foo: ["baq", "bar"] })); // Prints { a: "bar" }, using th
 Context values could be objects and arrays.
 
 ```js
-var template = parse("{{foo:baz}}");
+const template = parse("{{foo:baz}}");
 
 console.log(template.parameters); // Prints [{ key: "foo", defaultValue: "baz" }]
 
@@ -68,7 +68,7 @@ console.log(template({ foo: { value: 'bar' } })); // Prints { value: 'bar' } , u
 The kind of templating you can see in the above examples gets applied to any string values in complex object structures such as ElasticSearch queries. Here's an example of an ElasticSearch query.
 
 ```js
-var template = parse({
+const template = parse({
   index: "myindex",
   body: {
     query: {
