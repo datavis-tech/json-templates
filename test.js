@@ -305,8 +305,8 @@ describe('json-template', () => {
     });
   });
 
-  // This section tests that the parse function from the context
-  // and applies the string templating correctly.
+  // This section tests that the parse function applies the templating
+  // on string with function
   describe('function', () => {
     it('should compute template with function', () => {
       const template = parse(['{{userCard}}']);
