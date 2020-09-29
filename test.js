@@ -305,6 +305,16 @@ describe('json-template', () => {
     });
   });
 
+  // This section tests that the parse function applies the templating
+  // on string with function
+  describe('function', () => {
+    it('should compute template with function', () => {
+      const template = parse(['{{userCard}}']);
+      assert.deepEqual(template.parameters, [{ key: 'userCard' }]);
+      assert.deepEqual(template({ userCard: () => ({ id: 1, user: "John" }) }), [{ id: 1, user: "John" }]);
+    });
+  });
+
   // This section tests that arbitrary types may be present
   // as leaf nodes of the object tree, and they are handled correctly.
   describe('unknown types', () => {

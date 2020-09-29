@@ -96,6 +96,10 @@ const parseString = (() => {
             value = parameter.defaultValue;
           }
 
+          if (typeof value === 'function') {
+            return value();
+          }
+
           if (typeof value === 'object') {
             return value;
           }
