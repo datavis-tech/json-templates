@@ -313,6 +313,12 @@ describe('json-template', () => {
       assert.deepEqual(template.parameters, [{ key: 'userCard' }]);
       assert.deepEqual(template({ userCard: () => ({ id: 1, user: "John" }) }), [{ id: 1, user: "John" }]);
     });
+
+    it('should compute template with function with multiple inner parameters', () => {
+      const template = parse(JSON.stringify({ username: "{{username}}", password: "{{password}}" }));
+      assert.deepEqual(template.parameters, [{ key: 'username' }, { key: 'password' }]);
+      assert.equal(template({ username: () => ("John"), password: () => ("John") }), '{"username":"John","password":"John"}');
+    });
   });
 
   // This section tests that arbitrary types may be present
