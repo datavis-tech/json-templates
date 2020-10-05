@@ -97,7 +97,7 @@ const parseString = (() => {
           }
 
           if (typeof value === 'function') {
-            return value();
+            value = value();
           }
 
           if (typeof value === 'object') {
