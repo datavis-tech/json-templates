@@ -126,17 +126,17 @@ Here's how the above `title` parameter could have a default value of `test`:
 
 ```json
 {
-  index: 'myindex',
-  body: {
-    query: {
-      match: {
-        title: '{{title:test}}'
+  "index": "myindex",
+  "body": {
+    "query": {
+      "match": {
+        "title": "{{title:test}}"
       }
     },
-    facets: {
-      tags: {
-        terms: {
-          field: 'tags'
+    "facets": {
+      "tags": {
+        "terms": {
+          "field": "tags"
         }
       }
     }
