@@ -124,7 +124,7 @@ We also needed to know which parameters are required to "fill in" a given query 
 
 Here's how the above `title` parameter could have a default value of `test`:
 
-```
+```json
 {
   index: 'myindex',
   body: {
