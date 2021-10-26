@@ -5,6 +5,7 @@
 // Contributions from Paul Brewer and Javier Blanco Martinez.
 const objectPath = require('object-path');
 const dedupe = require('dedupe');
+const safeEval = require('notevil');
 
 // An enhanced version of `typeof` that handles arrays and dates as well.
 function type(value) {
@@ -78,7 +79,7 @@ function parse(value) {
 const parseString = (() => {
   // This regular expression detects instances of the
   // template parameter syntax such as {{foo}} or {{foo:someDefault}}.
-  const regex = /{{(\w|:|[\s-+.,@/\//()?=*_$])+}}/g;
+  const regex = /{{(\w|:|[\{\}\"\[\]\s-+.,@/\//()?=*_$])+?}}/g;
 
   return str => {
     let parameters = [];
@@ -94,6 +95,13 @@ const parseString = (() => {
           let value = objectPath.get(context, parameter.key);
           if (value === undefined || value == null) {
             value = parameter.defaultValue;
+
+            try{
+              value = safeEval(parameter.defaultValue, context)
+            }catch (ex){
+              //do nothing
+            }
+
           }
 
           if (typeof value === 'function') {
