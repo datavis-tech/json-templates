@@ -547,8 +547,8 @@ describe('json-template', () => {
     });
 
     it('should eval right defaultValue', () => {
-      const template = parse({a: "{{foo.bar1:[defaultValue1]}}", b: "{{foo.bar2:({dval2: defaultValue2})}}"});
-      assert.deepEqual(template({defaultValue1: "array_value", defaultValue2: "object_value"}), {
+      const template = parse({a: "{{foo.bar1:[defaultValue1]}}", b: "{{foo.bar2:({dval2: defaultValue2})}}"}, true);
+      assert.deepEqual(template({defaultValue1: "array_value", defaultValue2: "object_value"}, true), {
         a: ["array_value"],
         b: {dval2: "object_value"}
       });

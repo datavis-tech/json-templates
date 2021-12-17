@@ -59,14 +59,14 @@ function Template(fn, parameters) {
 // The returned function has a `parameters` property,
 // which is an array of parameter descriptor objects,
 // each of which has a `key` property and possibly a `defaultValue` property.
-function parse(value) {
+function parse(value, evalDefaults = false) {
   switch (type(value)) {
     case 'string':
-      return parseString(value);
+      return parseString(value, evalDefaults);
     case 'object':
-      return parseObject(value);
+      return parseObject(value, evalDefaults);
     case 'array':
-      return parseArray(value);
+      return parseArray(value, evalDefaults);
     default:
       return Template(function() {
         return value;
@@ -81,7 +81,7 @@ const parseString = (() => {
   // template parameter syntax such as {{foo}} or {{foo:someDefault}}.
   const regex = /{{(\w|:|[\{\}\"\[\]\s-+.,@/\//()?=*_$])+?}}/g;
 
-  return str => {
+  return (str, evalDefaults = false) => {
     let parameters = [];
     let templateFn = () => str;
 
@@ -96,12 +96,13 @@ const parseString = (() => {
           if (value === undefined || value == null) {
             value = parameter.defaultValue;
 
-            try{
-              value = safeEval(parameter.defaultValue, context)
-            }catch (ex){
-              //do nothing
+            if (evalDefaults === true) {
+              try{
+                value = safeEval(parameter.defaultValue, context)
+              }catch (ex){
+                //do nothing
+              }
             }
-
           }
 
           if (typeof value === 'function') {
@@ -131,10 +132,10 @@ const parseString = (() => {
 })();
 
 // Parses non-leaf-nodes in the template object that are objects.
-function parseObject(object) {
+function parseObject(object, evalDefaults = false) {
   const children = Object.keys(object).map(key => ({
-    keyTemplate: parseString(key),
-    valueTemplate: parse(object[key])
+    keyTemplate: parseString(key, evalDefaults),
+    valueTemplate: parse(object[key], evalDefaults)
   }));
   const templateParameters = children.reduce(
     (parameters, child) =>
@@ -152,8 +153,8 @@ function parseObject(object) {
 }
 
 // Parses non-leaf-nodes in the template object that are arrays.
-function parseArray(array) {
-  const templates = array.map(parse);
+function parseArray(array, evalDefaults = false) {
+  const templates = array.map(el => parse(el, evalDefaults));
   const templateParameters = templates.reduce(
     (parameters, template) => parameters.concat(template.parameters),
     []
