@@ -27,7 +27,7 @@ describe('json-template', () => {
     });
 
     it('should compute template for strings with no parameters', () => {
-      ['foo', '{{}}', '}}{{', '}}foo{{'].forEach(function(value) {
+      ['foo', '{{}}', '}}{{', '}}foo{{'].forEach(function (value) {
         const template = parse(value);
         assert.deepEqual(template.parameters, []);
         assert.equal(template(), value);
@@ -612,4 +612,181 @@ describe('json-template', () => {
       assert.deepEqual(template({ foo: { isNull: null, isNonNull: 'value' } }), { boo: 'defaultValue value' });
     });
   });
+
+  // This section includes Extract related tests added by RmR
+  describe('Extract functionality', () => {
+    it('when all elements of the template are parameters and in order', () => {
+      const template = parse({
+        username: "{{username}}",
+        password: "{{password}}"
+      });
+
+      const context = {
+        username: 'curran',
+        password: 'bestdeveloper'
+      }
+
+      const result = {
+        username: 'curran',
+        password: 'bestdeveloper'
+      }
+
+      const res = template.extract(context)
+      assert.deepEqual(res, result);
+    });
+
+
+    it('when all elements of the template are parameters but in different order', () => {
+      const template = parse({
+        username: "{{username}}",
+        password: "{{password}}"
+      });
+
+      const context = {
+        password: 'bestdeveloper',
+        username: 'curran'
+      }
+
+      const result = {
+        password: 'bestdeveloper',
+        username: 'curran'
+      }
+
+      const res = template.extract(context)
+      assert.deepEqual(res, result);
+    });
+
+    it('when only some of the elements of the template are parameters', () => {
+      const template = parse({
+        authtype: 'email',
+        username: "{{username}}",
+        password: "{{password}}"
+      });
+
+      const context = {
+        username: 'curran',
+        password: 'bestdeveloper'
+      }
+
+      const result = {
+        username: 'curran',
+        password: 'bestdeveloper'
+      }
+
+      const res = template.extract(context)
+      assert.deepEqual(res, result);
+    });
+
+    it('when the parameters are deep into the template', () => {
+      const template = parse({
+        authtype: 'email',
+        authinfo: {
+          username: "{{username}}",
+          password: "{{password}}"
+        }
+      });
+
+      const context = {
+        authtype: 'email',
+        authinfo: {
+          username: 'curran',
+          password: 'bestdeveloper'
+        }
+      }
+
+      const result = {
+        username: 'curran',
+        password: 'bestdeveloper',
+      }
+
+      const res = template.extract(context)
+      assert.deepEqual(res, result);
+    });
+
+    it('when some of the parameters are missing in the context but have default values', () => {
+      const template = parse({
+        authtype: 'email',
+        authinfo: {
+          username: "{{username}}",
+          password: "{{password}}",
+          something: "{{something:test}}"
+        }
+      });
+
+      const context = {
+        authtype: 'email',
+        authinfo: {
+          username: 'curran',
+          password: 'bestdeveloper'
+        }
+      }
+
+      const result = {
+        username: 'curran',
+        password: 'bestdeveloper',
+        something: 'test'
+      }
+
+      const res = template.extract(context)
+      assert.deepEqual(res, result);
+    });
+
+    it('when some of the parameters are missing in the context but have no default values', () => {
+      const template = parse({
+        authtype: 'email',
+        authinfo: {
+          username: "{{username}}",
+          password: "{{password}}",
+          something: "{{something}}"
+        }
+      });
+
+      const context = {
+        authtype: 'email',
+        authinfo: {
+          username: 'curran',
+          password: 'bestdeveloper'
+        }
+      }
+
+      const result = {
+        username: 'curran',
+        password: 'bestdeveloper',
+        something: null
+      }
+
+      const res = template.extract(context)
+      assert.deepEqual(res, result);
+    });
+
+    it('when the context has elements other than the parameters of the template', () => {
+      const template = parse({
+        authtype: 'email',
+        authinfo: {
+          username: "{{username}}",
+          password: "{{password}}"
+        }
+      });
+
+      const context = {
+        authtype: 'email',
+        authinfo: {
+          username: 'curran',
+          password: 'bestdeveloper',
+          something: 'test'
+        },
+        somethingelse: 'nothing'
+      }
+
+      const result = {
+        username: 'curran',
+        password: 'bestdeveloper',
+      }
+
+      const res = template.extract(context)
+      assert.deepEqual(res, result);
+    });
+
+  });
+
 });

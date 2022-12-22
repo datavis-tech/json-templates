@@ -44,7 +44,13 @@ function Parameter(match) {
 function Template(fn, parameters) {
   // Paul Brewer Dec 2017 add deduplication call, use only key property to eliminate
   Object.assign(fn, {
-    parameters: dedupe(parameters, item => item.key)
+    parameters: dedupe(parameters, item => item.key),
+    // RmR added to include extract function
+    //
+    // extract returns an object of all parameters of the template given a result object
+    extract: function (obj) {
+      return extract(this.parameters, obj)
+    }
   });
 
   return fn;
@@ -154,5 +160,48 @@ function parseArray(array) {
 
   return Template(templateFn, templateParameters);
 }
+
+// functions required for Extract added by RmR
+function extract(params, obj) {
+  // construct extract json
+  let _ejson = {}
+  // loop through params
+  for (let i = 0; i < params.length; i++) {
+    const _keyname = params[i].key
+    // findKey of _keyname
+    const _arr = findKey(obj, _keyname)
+    // check not null
+    if (_arr.length > 0) {
+      _ejson[_keyname] = _arr[0]
+    }
+    else { // if key is missing put defaultValue if it exists else null
+      _ejson[_keyname] = params[i].defaultValue
+    }
+  }
+  return _ejson
+}
+
+// find key is sourced from npm json-findbykey
+function findKey(obj, keyname) {
+  let result = []
+  const mergeArray = (s1, s2) => result = [...s1, ...s2];
+  if (Array.isArray(obj)) {
+    obj.forEach(o => {
+      mergeArray(result, findKey(o, keyname))
+    })
+  } else {
+    if (typeof obj === 'object') {
+      Object.keys(obj).forEach(k => {
+        if (k === keyname) {
+          result.push(obj[k])
+        }
+        if (obj[k] !== undefined && obj[k] !== null)
+          mergeArray(result, findKey(obj[k], keyname))
+      })
+    }
+  }
+  return result
+}
+
 
 module.exports = parse;
