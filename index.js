@@ -84,15 +84,15 @@ const parseString = (() => {
     let parameters = [];
     let templateFn = () => str;
 
-    if (regex.test(str)) {
-      const matches = str.match(regex);
+    const matches = str.match(regex);
+    if (matches) {
       parameters = matches.map(Parameter);
       templateFn = context => {
         context = context || {};
-        return matches.reduce((str, match, i) => {
+        return matches.reduce((result, match, i) => {
           const parameter = parameters[i];
           let value = objectPath.get(context, parameter.key);
-          if (value === undefined || value == null) {
+          if (value == null) {
             value = parameter.defaultValue;
           }
 
@@ -104,16 +104,12 @@ const parseString = (() => {
             return value;
           }
 
-          if (value === undefined || value === null) {
-            return null;
-          }
-
           // Accommodate numbers as values.
           if (matches.length === 1 && str.startsWith('{{') && str.endsWith('}}')) {
             return value;
           }
 
-          return str.replace(match, value);
+          return result.replace(match, value == null ? '' : value);
         }, str);
       };
     }
