@@ -130,6 +130,11 @@ describe('json-template', () => {
       const template = parse('{{foo}}');
       assert.equal(template({ foo: '' }), '');
     });
+
+    it('should handle null and undefined as empty strings for parameter value', () => {
+      const template = parse('{{foo}} {{bar}}');
+      assert.equal(template({ foo: null }), ' ');
+    });
   });
 
   // This section tests that the parse function recursively
