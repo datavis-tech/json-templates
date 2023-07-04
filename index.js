@@ -93,15 +93,15 @@ const parseString = (() => {
           const parameter = parameters[i];
           let value = objectPath.get(context, parameter.key);
 
-          if (type(value) === 'undefined') {
+          if (typeof value === 'undefined') {
             value = parameter.defaultValue;
           }
 
-          if (type(value) === 'function') {
+          if (typeof value === 'function') {
             value = value();
           }
 
-          if (type(value) === 'object') {
+          if (typeof value === 'object' && value !== null) {
             return value;
           }
 
