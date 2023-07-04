@@ -621,7 +621,7 @@ describe('json-template', () => {
     });
   });
 
-  describe('string tempalte', () => {
+  describe('string template', () => {
     it('should be string type when there are more than one slots', () => {
       const template = parse('{{foo}}{{bar}}');
       assert.equal(template({ foo: 1, bar: 'a' }), '1a');
