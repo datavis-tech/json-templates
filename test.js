@@ -326,7 +326,7 @@ describe('json-template', () => {
     });
   });
 
-  describe.only('date', () => {
+  describe('date', () => {
     it('should compute template with Date', () => {
       const template = parse('{{now}}');
       const now = new Date();
