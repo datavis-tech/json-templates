@@ -326,6 +326,14 @@ describe('json-template', () => {
     });
   });
 
+  describe.only('date', () => {
+    it('should compute template with Date', () => {
+      const template = parse('{{now}}');
+      const now = new Date();
+      assert.strictEqual(template({ now }), now);
+    });
+  });
+
   // This section tests that arbitrary types may be present
   // as leaf nodes of the object tree, and they are handled correctly.
   describe('unknown types', () => {
@@ -595,26 +603,41 @@ describe('json-template', () => {
     });
   });
 
-  // This section tests that if the match is not found the template should be replaced by null
+  // This section tests that if the match is not found the template should remains undefined
   describe('no match on the given context', () => {
     it('should replace the given template by null if no match found for an string', () => {
       const template = parse('{{foo}}');
-      assert.equal(template({}), null);
+      assert.strictEqual(template({}), undefined);
     });
 
     it('should replace the given template by null if no match found for an object', () => {
       const template = parse({ boo: '{{foo}}' });
-      assert.deepEqual(template({}), { boo: null });
+      assert.deepStrictEqual(template({}), { boo: undefined });
     });
 
     it('should replace the given template by null if the found value is null', () => {
       const template = parse({ boo: '{{foo}}' });
-      assert.deepEqual(template({ foo: null }), { boo: null });
-    });
-
-    it('should handle multi-value expressions where the first value is null, but has a defaultValue', () => {
-      const template = parse({ boo: '{{foo.isNull:defaultValue}} {{foo.isNonNull}}' });
-      assert.deepEqual(template({ foo: { isNull: null, isNonNull: 'value' } }), { boo: 'defaultValue value' });
+      assert.deepStrictEqual(template({ foo: null }), { boo: null });
     });
   });
+
+  describe('string tempalte', () => {
+    it('should be string type when there are more than one slots', () => {
+      const template = parse('{{foo}}{{bar}}');
+      assert.equal(template({ foo: 1, bar: 'a' }), '1a');
+      assert.equal(template({ bar: 'a' }), 'a');
+      assert.equal(template({ foo: 1 }), '1');
+      assert.equal(template({ foo: true, bar: false }), 'truefalse');
+      assert.equal(template({ foo: undefined }), '');
+      assert.equal(template({ foo: null }), '');
+      assert.equal(template({}), '');
+      assert.equal(template(), '');
+      assert.equal(template({ foo: Number.NaN }), 'NaN');
+    });
+
+    it('default value', () => {
+      const template = parse({ boo: '{{foo.isNull:null}} {{foo.isUndefined:undefined}} {{foo.isNonNull}}' });
+      assert.deepStrictEqual(template({ foo: { isNull: null, isNonNull: 'value' } }), { boo: ' undefined value' });
+    });
+  })
 });
