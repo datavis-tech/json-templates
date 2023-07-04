@@ -610,7 +610,7 @@ describe('json-template', () => {
       assert.strictEqual(template({}), undefined);
     });
 
-    it('should replace the given template by null if no match found for an object', () => {
+    it('should replace the given template by undefined if no match found for an object', () => {
       const template = parse({ boo: '{{foo}}' });
       assert.deepStrictEqual(template({}), { boo: undefined });
     });
