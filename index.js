@@ -4,7 +4,6 @@
 // Created by Curran Kelleher and Chrostophe Serafin.
 // Contributions from Paul Brewer and Javier Blanco Martinez.
 const objectPath = require('object-path');
-const dedupe = require('dedupe');
 
 // An enhanced version of `typeof` that handles arrays and dates as well.
 function type(value) {
@@ -42,11 +41,7 @@ function Parameter(match) {
 
 // Constructs a template function with deduped `parameters` property.
 function Template(fn, parameters) {
-  // Paul Brewer Dec 2017 add deduplication call, use only key property to eliminate
-  Object.assign(fn, {
-    parameters: dedupe(parameters, item => item.key)
-  });
-
+  fn.parameters = Array.from(new Map(parameters.map(parameter => [parameter.key, parameter])).values())
   return fn;
 }
 
