@@ -5,9 +5,7 @@ export default {
   output: {
     format: 'umd',
     name: 'jsonTemplates',
-    file: 'dist/index.js'
+    file: 'dist/index.js',
   },
-  plugins: [
-    buble()
-  ]
-}
+  plugins: [buble()],
+};

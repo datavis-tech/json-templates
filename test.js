@@ -21,13 +21,15 @@ describe('json-template', () => {
 
     it('should compute template for a string with a nested object parameter', () => {
       const template = parse('{{foo.value:baz}}');
-      assert.deepEqual(template.parameters, [{ key: 'foo.value', defaultValue: 'baz' }]);
+      assert.deepEqual(template.parameters, [
+        { key: 'foo.value', defaultValue: 'baz' },
+      ]);
       assert.equal(template({ foo: { value: 'bar' } }), 'bar');
       assert.equal(template(), 'baz');
     });
 
     it('should compute template for strings with no parameters', () => {
-      ['foo', '{{}}', '}}{{', '}}foo{{'].forEach(function(value) {
+      ['foo', '{{}}', '}}{{', '}}foo{{'].forEach(function (value) {
         const template = parse(value);
         assert.deepEqual(template.parameters, []);
         assert.equal(template(), value);
@@ -39,8 +41,8 @@ describe('json-template', () => {
       assert.deepEqual(template.parameters, [
         {
           key: 'foo',
-          defaultValue: 'bar'
-        }
+          defaultValue: 'bar',
+        },
       ]);
       assert.equal(template(), 'bar');
       assert.equal(template({ foo: 'baz' }), 'baz');
@@ -52,8 +54,8 @@ describe('json-template', () => {
       assert.deepEqual(template.parameters, [
         {
           key: 'foo',
-          defaultValue: 'bar:baz'
-        }
+          defaultValue: 'bar:baz',
+        },
       ]);
       assert.equal(template(), 'bar:baz');
       assert.equal(template({ foo: 'baz' }), 'baz');
@@ -68,7 +70,10 @@ describe('json-template', () => {
 
     it('should compute template for a string with multiple inner parameters', () => {
       const template = parse('Hello {{firstName}} {{lastName}}, how are you ?');
-      assert.deepEqual(template.parameters, [{ key: 'firstName' }, { key: 'lastName' }]);
+      assert.deepEqual(template.parameters, [
+        { key: 'firstName' },
+        { key: 'lastName' },
+      ]);
       assert.equal(
         template({ firstName: 'Jane', lastName: 'Doe' }),
         'Hello Jane Doe, how are you ?'
@@ -76,8 +81,13 @@ describe('json-template', () => {
     });
 
     it('should handle extra whitespace', () => {
-      const template = parse('Hello {{firstName }} {{ lastName}}, how are you ?');
-      assert.deepEqual(template.parameters, [{ key: 'firstName' }, { key: 'lastName' }]);
+      const template = parse(
+        'Hello {{firstName }} {{ lastName}}, how are you ?'
+      );
+      assert.deepEqual(template.parameters, [
+        { key: 'firstName' },
+        { key: 'lastName' },
+      ]);
       assert.equal(
         template({ firstName: 'Jane', lastName: 'Doe' }),
         'Hello Jane Doe, how are you ?'
@@ -86,21 +96,27 @@ describe('json-template', () => {
 
     it('should handle dashes in defaults', () => {
       const template = parse('{{startTime:now-24h}}');
-      assert.deepEqual(template.parameters, [{ key: 'startTime', defaultValue: 'now-24h' }]);
+      assert.deepEqual(template.parameters, [
+        { key: 'startTime', defaultValue: 'now-24h' },
+      ]);
       assert.equal(template({ startTime: 'now-48h' }), 'now-48h');
       assert.equal(template(), 'now-24h');
     });
 
     it('should handle special characters in defaults', () => {
       const template = parse('{{foo:-+., @/()?=*_}}');
-      assert.deepEqual(template.parameters, [{ key: 'foo', defaultValue: '-+., @/()?=*_' }]);
+      assert.deepEqual(template.parameters, [
+        { key: 'foo', defaultValue: '-+., @/()?=*_' },
+      ]);
       assert.equal(template({ foo: '-+., @/()?=*_' }), '-+., @/()?=*_');
       assert.equal(template(), '-+., @/()?=*_');
     });
 
     it('should handle email address in defaults', () => {
       const template = parse('{{email:jdoe@mail.com}}');
-      assert.deepEqual(template.parameters, [{ key: 'email', defaultValue: 'jdoe@mail.com' }]);
+      assert.deepEqual(template.parameters, [
+        { key: 'email', defaultValue: 'jdoe@mail.com' },
+      ]);
       assert.equal(template({ email: 'jdoe@mail.com' }), 'jdoe@mail.com');
       assert.equal(template(), 'jdoe@mail.com');
     });
@@ -108,16 +124,19 @@ describe('json-template', () => {
     it('should handle phone number in defaults', () => {
       const template = parse('{{phone:+1 (256) 34-34-4556}}');
       assert.deepEqual(template.parameters, [
-        { key: 'phone', defaultValue: '+1 (256) 34-34-4556' }
+        { key: 'phone', defaultValue: '+1 (256) 34-34-4556' },
       ]);
-      assert.equal(template({ phone: '+1 (256) 34-34-4556' }), '+1 (256) 34-34-4556');
+      assert.equal(
+        template({ phone: '+1 (256) 34-34-4556' }),
+        '+1 (256) 34-34-4556'
+      );
       assert.equal(template(), '+1 (256) 34-34-4556');
     });
 
     it('should handle url in defaults', () => {
       const template = parse('{{url:http://www.host.com/path?key_1=value}}');
       assert.deepEqual(template.parameters, [
-        { key: 'url', defaultValue: 'http://www.host.com/path?key_1=value' }
+        { key: 'url', defaultValue: 'http://www.host.com/path?key_1=value' },
       ]);
       assert.equal(
         template({ url: 'http://www.host.com/path?key_1=value' }),
@@ -143,7 +162,9 @@ describe('json-template', () => {
     it('should compute template with an object that has inner parameter', () => {
       const template = parse({ title: 'Hello {{foo}}, how are you ?' });
       assert.deepEqual(template.parameters, [{ key: 'foo' }]);
-      assert.deepEqual(template({ foo: 'john' }), { title: 'Hello john, how are you ?' });
+      assert.deepEqual(template({ foo: 'john' }), {
+        title: 'Hello john, how are you ?',
+      });
     });
 
     it('should compute template with an object', () => {
@@ -167,26 +188,31 @@ describe('json-template', () => {
     it('should compute template with an object with multiple parameters', () => {
       const template = parse({
         title: '{{myTitle}}',
-        description: '{{myDescription}}'
+        description: '{{myDescription}}',
       });
 
-      assert.deepEqual(template.parameters, [{ key: 'myTitle' }, { key: 'myDescription' }]);
+      assert.deepEqual(template.parameters, [
+        { key: 'myTitle' },
+        { key: 'myDescription' },
+      ]);
 
       assert.deepEqual(
         template({
           myTitle: 'foo',
-          myDescription: 'bar'
+          myDescription: 'bar',
         }),
         {
           title: 'foo',
-          description: 'bar'
+          description: 'bar',
         }
       );
     });
 
     it('should compute template for an object with a nested object parameter', () => {
       const template = parse({ a: '{{foo.1:baz}}' });
-      assert.deepEqual(template.parameters, [{ key: 'foo.1', defaultValue: 'baz' }]);
+      assert.deepEqual(template.parameters, [
+        { key: 'foo.1', defaultValue: 'baz' },
+      ]);
       assert.deepEqual(template({ foo: ['baq', 'bar'] }), { a: 'bar' });
       assert.deepEqual(template(), { a: 'baz' });
     });
@@ -194,32 +220,35 @@ describe('json-template', () => {
     it('should compute template with nested objects', () => {
       const template = parse({
         body: {
-          title: '{{foo}}'
-        }
+          title: '{{foo}}',
+        },
       });
 
       assert.deepEqual(template.parameters, [{ key: 'foo' }]);
 
       assert.deepEqual(template({ foo: 'bar' }), {
         body: {
-          title: 'bar'
-        }
+          title: 'bar',
+        },
       });
     });
 
     it('should compute template keys', () => {
       const template = parse({
         body: {
-          'A simple {{message}} to': '{{foo}}'
-        }
+          'A simple {{message}} to': '{{foo}}',
+        },
       });
 
-      assert.deepEqual(template.parameters, [{ key: 'foo' }, { key: 'message' }]);
+      assert.deepEqual(template.parameters, [
+        { key: 'foo' },
+        { key: 'message' },
+      ]);
 
       assert.deepEqual(template({ foo: 'bar', message: 'hello' }), {
         body: {
-          'A simple hello to': 'bar'
-        }
+          'A simple hello to': 'bar',
+        },
       });
     });
 
@@ -230,63 +259,66 @@ describe('json-template', () => {
 
       const template = parse({
         disk: '/project/{{project}}/region/{{region}}/ssd',
-        vm: '/project/{{project}}/region/{{region}}/cpu'
+        vm: '/project/{{project}}/region/{{region}}/cpu',
       });
 
       it('should correctly fill duplicate references in a template', () => {
         assert.deepEqual(template({ project: 'alpha', region: 'us-central' }), {
           disk: '/project/alpha/region/us-central/ssd',
-          vm: '/project/alpha/region/us-central/cpu'
+          vm: '/project/alpha/region/us-central/cpu',
         });
       });
 
       it('should deduplicate template parameters', () => {
-        assert.deepEqual(template.parameters, [{ key: 'project' }, { key: 'region' }]);
+        assert.deepEqual(template.parameters, [
+          { key: 'project' },
+          { key: 'region' },
+        ]);
       });
     });
 
     it('should compute template keys with default value', () => {
       const template = parse({
         body: {
-          'A simple {{message:hello}} to': '{{foo}}'
-        }
+          'A simple {{message:hello}} to': '{{foo}}',
+        },
       });
 
       assert.deepEqual(template.parameters, [
         { key: 'foo' },
-        { key: 'message', defaultValue: 'hello' }
+        { key: 'message', defaultValue: 'hello' },
       ]);
 
       assert.deepEqual(template({ foo: 'bar' }), {
         body: {
-          'A simple hello to': 'bar'
-        }
+          'A simple hello to': 'bar',
+        },
       });
     });
 
     it('should compute template keys with default value and period in the string', () => {
       const template = parse({
         body: {
-          'A simple {{message:hello.foo}} to': '{{foo}}'
-        }
+          'A simple {{message:hello.foo}} to': '{{foo}}',
+        },
       });
 
       assert.deepEqual(template.parameters, [
         { key: 'foo' },
-        { key: 'message', defaultValue: 'hello.foo' }
+        { key: 'message', defaultValue: 'hello.foo' },
       ]);
 
       assert.deepEqual(template({ foo: 'bar' }), {
         body: {
-          'A simple hello.foo to': 'bar'
-        }
+          'A simple hello.foo to': 'bar',
+        },
       });
     });
 
     it('should allow template with null leaf values', () => {
       const spec = {
         x: '{{foo}}',
-        y: null
+        y: null,
       };
       const template = parse(spec);
       assert.deepEqual(template.parameters, [{ key: 'foo' }]);
@@ -316,13 +348,24 @@ describe('json-template', () => {
     it('should compute template with function', () => {
       const template = parse(['{{userCard}}']);
       assert.deepEqual(template.parameters, [{ key: 'userCard' }]);
-      assert.deepEqual(template({ userCard: () => ({ id: 1, user: "John" }) }), [{ id: 1, user: "John" }]);
+      assert.deepEqual(
+        template({ userCard: () => ({ id: 1, user: 'John' }) }),
+        [{ id: 1, user: 'John' }]
+      );
     });
 
     it('should compute template with function with multiple inner parameters', () => {
-      const template = parse(JSON.stringify({ username: "{{username}}", password: "{{password}}" }));
-      assert.deepEqual(template.parameters, [{ key: 'username' }, { key: 'password' }]);
-      assert.equal(template({ username: () => ("John"), password: () => ("John") }), '{"username":"John","password":"John"}');
+      const template = parse(
+        JSON.stringify({ username: '{{username}}', password: '{{password}}' })
+      );
+      assert.deepEqual(template.parameters, [
+        { key: 'username' },
+        { key: 'password' },
+      ]);
+      assert.equal(
+        template({ username: () => 'John', password: () => 'John' }),
+        '{"username":"John","password":"John"}'
+      );
     });
   });
 
@@ -377,17 +420,17 @@ describe('json-template', () => {
         body: {
           query: {
             match: {
-              title: '{{title}}'
-            }
+              title: '{{title}}',
+            },
           },
           facets: {
             tags: {
               terms: {
-                field: 'tags'
-              }
-            }
-          }
-        }
+                field: 'tags',
+              },
+            },
+          },
+        },
       });
 
       assert.deepEqual(template.parameters, [{ key: 'title' }]);
@@ -397,17 +440,17 @@ describe('json-template', () => {
         body: {
           query: {
             match: {
-              title: 'test'
-            }
+              title: 'test',
+            },
           },
           facets: {
             tags: {
               terms: {
-                field: 'tags'
-              }
-            }
-          }
-        }
+                field: 'tags',
+              },
+            },
+          },
+        },
       });
     });
 
@@ -417,24 +460,24 @@ describe('json-template', () => {
         body: {
           query: {
             match: {
-              title: '{{title:test}}'
-            }
+              title: '{{title:test}}',
+            },
           },
           facets: {
             tags: {
               terms: {
-                field: 'tags'
-              }
-            }
-          }
-        }
+                field: 'tags',
+              },
+            },
+          },
+        },
       });
 
       assert.deepEqual(template.parameters, [
         {
           key: 'title',
-          defaultValue: 'test'
-        }
+          defaultValue: 'test',
+        },
       ]);
 
       assert.deepEqual(template(), {
@@ -442,17 +485,17 @@ describe('json-template', () => {
         body: {
           query: {
             match: {
-              title: 'test'
-            }
+              title: 'test',
+            },
           },
           facets: {
             tags: {
               terms: {
-                field: 'tags'
-              }
-            }
-          }
-        }
+                field: 'tags',
+              },
+            },
+          },
+        },
       });
 
       assert.deepEqual(template({ title: 'foo' }), {
@@ -460,17 +503,17 @@ describe('json-template', () => {
         body: {
           query: {
             match: {
-              title: 'foo'
-            }
+              title: 'foo',
+            },
           },
           facets: {
             tags: {
               terms: {
-                field: 'tags'
-              }
-            }
-          }
-        }
+                field: 'tags',
+              },
+            },
+          },
+        },
       });
     });
 
@@ -480,81 +523,84 @@ describe('json-template', () => {
         bool: {
           must: {
             term: {
-              user: 'kimchy'
-            }
+              user: 'kimchy',
+            },
           },
           filter: {
             term: {
-              tag: 'tech'
-            }
+              tag: 'tech',
+            },
           },
           must_not: {
             range: {
               age: {
                 from: 10,
-                to: 20
-              }
-            }
+                to: 20,
+              },
+            },
           },
           should: [
             {
               term: {
-                tag: '{{myTag1}}'
-              }
+                tag: '{{myTag1}}',
+              },
             },
             {
               term: {
-                tag: '{{myTag2}}'
-              }
-            }
+                tag: '{{myTag2}}',
+              },
+            },
           ],
           minimum_should_match: 1,
-          boost: 1
-        }
+          boost: 1,
+        },
       });
 
-      assert.deepEqual(template.parameters, [{ key: 'myTag1' }, { key: 'myTag2' }]);
+      assert.deepEqual(template.parameters, [
+        { key: 'myTag1' },
+        { key: 'myTag2' },
+      ]);
 
       assert.deepEqual(
         template({
           myTag1: 'wow',
-          myTag2: 'cats'
+          myTag2: 'cats',
         }),
         {
           bool: {
             must: {
               term: {
-                user: 'kimchy'
-              }
+                user: 'kimchy',
+              },
             },
             filter: {
               term: {
-                tag: 'tech'
-              }
+                tag: 'tech',
+              },
             },
             must_not: {
               range: {
                 age: {
                   from: 10,
-                  to: 20
-                }
-              }
+                  to: 20,
+                },
+              },
             },
             should: [
               {
                 term: {
-                  tag: 'wow'
-                }
+                  tag: 'wow',
+                },
               },
               {
                 term: {
-                  tag: 'cats'
-                }
-              }
+                  tag: 'cats',
+                },
+              },
             ],
             minimum_should_match: 1,
-            boost: 1
-          }
+            boost: 1,
+          },
         }
       );
     });
@@ -565,20 +611,20 @@ describe('json-template', () => {
     it('should replace object without stringify', () => {
       const template = parse({
         s: '1',
-        b: '{{c.d}}'
+        b: '{{c.d}}',
       });
       const context = {
         c: {
           d: {
-            j: 'a'
-          }
-        }
+            j: 'a',
+          },
+        },
       };
       const expected = {
         s: '1',
         b: {
-          j: 'a'
-        }
+          j: 'a',
+        },
       };
       assert.deepEqual(template.parameters, [{ key: 'c.d' }]);
       assert.equal(JSON.stringify(template(context)), JSON.stringify(expected));
@@ -587,16 +633,16 @@ describe('json-template', () => {
     it('should replace array without stringify', () => {
       const template = parse({
         s: '1',
-        b: '{{c.d}}'
+        b: '{{c.d}}',
       });
       const context = {
         c: {
-          d: ['a', 'b', 'c']
-        }
+          d: ['a', 'b', 'c'],
+        },
       };
       const expected = {
         s: '1',
-        b: ['a', 'b', 'c']
+        b: ['a', 'b', 'c'],
       };
       assert.deepEqual(template.parameters, [{ key: 'c.d' }]);
       assert.equal(JSON.stringify(template(context)), JSON.stringify(expected));
@@ -636,8 +682,13 @@ describe('json-template', () => {
     });
 
     it('default value', () => {
-      const template = parse({ boo: '{{foo.isNull:null}} {{foo.isUndefined:undefined}} {{foo.isNonNull}}' });
-      assert.deepStrictEqual(template({ foo: { isNull: null, isNonNull: 'value' } }), { boo: ' undefined value' });
+      const template = parse({
+        boo: '{{foo.isNull:null}} {{foo.isUndefined:undefined}} {{foo.isNonNull}}',
+      });
+      assert.deepStrictEqual(
+        template({ foo: { isNull: null, isNonNull: 'value' } }),
+        { boo: ' undefined value' }
+      );
     });
-  })
+  });
 });

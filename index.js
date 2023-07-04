@@ -30,7 +30,7 @@ function Parameter(match) {
   if (i !== -1) {
     param = {
       key: matchValue.substr(0, i),
-      defaultValue: matchValue.substr(i + 1)
+      defaultValue: matchValue.substr(i + 1),
     };
   } else {
     param = { key: matchValue };
@@ -41,7 +41,9 @@ function Parameter(match) {
 
 // Constructs a template function with deduped `parameters` property.
 function Template(fn, parameters) {
-  fn.parameters = Array.from(new Map(parameters.map(parameter => [parameter.key, parameter])).values())
+  fn.parameters = Array.from(
+    new Map(parameters.map((parameter) => [parameter.key, parameter])).values()
+  );
   return fn;
 }
 
@@ -62,7 +64,7 @@ function parse(value) {
     case 'array':
       return parseArray(value);
     default:
-      return Template(function() {
+      return Template(function () {
         return value;
       }, []);
   }
@@ -75,14 +77,14 @@ const parseString = (() => {
   // template parameter syntax such as {{foo}} or {{foo:someDefault}}.
   const regex = /{{(\w|:|[\s-+.,@/\//()?=*_$])+}}/g;
 
-  return str => {
+  return (str) => {
     let parameters = [];
     let templateFn = () => str;
 
     const matches = str.match(regex);
     if (matches) {
       parameters = matches.map(Parameter);
-      templateFn = context => {
+      templateFn = (context) => {
         context = context || {};
         return matches.reduce((result, match, i) => {
           const parameter = parameters[i];
@@ -101,7 +103,11 @@ const parseString = (() => {
           }
 
           // Accommodate numbers as values.
-          if (matches.length === 1 && str.startsWith('{{') && str.endsWith('}}')) {
+          if (
+            matches.length === 1 &&
+            str.startsWith('{{') &&
+            str.endsWith('}}')
+          ) {
             return value;
           }
 
@@ -116,16 +122,19 @@ const parseString = (() => {
 
 // Parses non-leaf-nodes in the template object that are objects.
 function parseObject(object) {
-  const children = Object.keys(object).map(key => ({
+  const children = Object.keys(object).map((key) => ({
     keyTemplate: parseString(key),
-    valueTemplate: parse(object[key])
+    valueTemplate: parse(object[key]),
   }));
   const templateParameters = children.reduce(
     (parameters, child) =>
-      parameters.concat(child.valueTemplate.parameters, child.keyTemplate.parameters),
+      parameters.concat(
+        child.valueTemplate.parameters,
+        child.keyTemplate.parameters
+      ),
     []
   );
-  const templateFn = context => {
+  const templateFn = (context) => {
     return children.reduce((newObject, child) => {
       newObject[child.keyTemplate(context)] = child.valueTemplate(context);
       return newObject;
@@ -142,7 +151,8 @@ function parseArray(array) {
     (parameters, template) => parameters.concat(template.parameters),
     []
   );
-  const templateFn = context => templates.map(template => template(context));
+  const templateFn = (context) =>
+    templates.map((template) => template(context));
 
   return Template(templateFn, templateParameters);
 }
