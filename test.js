@@ -605,7 +605,7 @@ describe('json-template', () => {
 
   // This section tests that if the match is not found the template should remains undefined
   describe('no match on the given context', () => {
-    it('should replace the given template by null if no match found for an string', () => {
+    it('should replace the given template by undefined if no match found for an string', () => {
       const template = parse('{{foo}}');
       assert.strictEqual(template({}), undefined);
     });
