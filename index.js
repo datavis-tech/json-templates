@@ -98,17 +98,18 @@ const parseString = (() => {
             value = value();
           }
 
-          if (typeof value === 'object' && value !== null) {
-            return value;
-          }
-
-          // Accommodate numbers as values.
+          // Accommodate non-string as original values.
           if (
             matches.length === 1 &&
             str.startsWith('{{') &&
             str.endsWith('}}')
           ) {
             return value;
+          }
+
+          // Treat Date value inside string to ISO string.
+          if (value instanceof Date) {
+            value = value.toISOString();
           }
 
           return result.replace(match, value == null ? '' : value);

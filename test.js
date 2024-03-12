@@ -375,6 +375,12 @@ describe('json-template', () => {
       const now = new Date();
       assert.strictEqual(template({ now }), now);
     });
+
+    it('should compute template with Date', () => {
+      const template = parse('a{{now}}');
+      const now = new Date();
+      assert.strictEqual(template({ now }), `a${now.toISOString()}`);
+    });
   });
 
   // This section tests that arbitrary types may be present
