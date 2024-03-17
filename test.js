@@ -154,6 +154,11 @@ describe('json-template', () => {
       const template = parse('{{foo}} {{bar}}');
       assert.equal(template({ foo: null }), ' ');
     });
+
+    it('number variable inside string should be replaced', () => {
+      const result = parse('abc{{a}}def')({ a: 1 });
+      assert.equal(result, 'abc1def');
+    });
   });
 
   // This section tests that the parse function recursively
