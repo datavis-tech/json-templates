@@ -154,6 +154,11 @@ describe('json-template', () => {
       const template = parse('{{foo}} {{bar}}');
       assert.equal(template({ foo: null }), ' ');
     });
+
+    it('number variable inside string should be replaced', () => {
+      const result = parse('abc{{a}}def')({ a: 1 });
+      assert.equal(result, 'abc1def');
+    });
   });
 
   // This section tests that the parse function recursively
@@ -374,6 +379,12 @@ describe('json-template', () => {
       const template = parse('{{now}}');
       const now = new Date();
       assert.strictEqual(template({ now }), now);
+    });
+
+    it('should compute template with Date', () => {
+      const template = parse('a{{now}}');
+      const now = new Date();
+      assert.strictEqual(template({ now }), `a${now.toISOString()}`);
     });
   });
 
