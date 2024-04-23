@@ -76,13 +76,13 @@ describe('json-template', () => {
       ]);
       assert.equal(
         template({ firstName: 'Jane', lastName: 'Doe' }),
-        'Hello Jane Doe, how are you ?'
+        'Hello Jane Doe, how are you ?',
       );
     });
 
     it('should handle extra whitespace', () => {
       const template = parse(
-        'Hello {{firstName }} {{ lastName}}, how are you ?'
+        'Hello {{firstName }} {{ lastName}}, how are you ?',
       );
       assert.deepEqual(template.parameters, [
         { key: 'firstName' },
@@ -90,7 +90,7 @@ describe('json-template', () => {
       ]);
       assert.equal(
         template({ firstName: 'Jane', lastName: 'Doe' }),
-        'Hello Jane Doe, how are you ?'
+        'Hello Jane Doe, how are you ?',
       );
     });
 
@@ -128,7 +128,7 @@ describe('json-template', () => {
       ]);
       assert.equal(
         template({ phone: '+1 (256) 34-34-4556' }),
-        '+1 (256) 34-34-4556'
+        '+1 (256) 34-34-4556',
       );
       assert.equal(template(), '+1 (256) 34-34-4556');
     });
@@ -140,7 +140,7 @@ describe('json-template', () => {
       ]);
       assert.equal(
         template({ url: 'http://www.host.com/path?key_1=value' }),
-        'http://www.host.com/path?key_1=value'
+        'http://www.host.com/path?key_1=value',
       );
       assert.equal(template(), 'http://www.host.com/path?key_1=value');
     });
@@ -209,7 +209,7 @@ describe('json-template', () => {
         {
           title: 'foo',
           description: 'bar',
-        }
+        },
       );
     });
 
@@ -355,13 +355,13 @@ describe('json-template', () => {
       assert.deepEqual(template.parameters, [{ key: 'userCard' }]);
       assert.deepEqual(
         template({ userCard: () => ({ id: 1, user: 'John' }) }),
-        [{ id: 1, user: 'John' }]
+        [{ id: 1, user: 'John' }],
       );
     });
 
     it('should compute template with function with multiple inner parameters', () => {
       const template = parse(
-        JSON.stringify({ username: '{{username}}', password: '{{password}}' })
+        JSON.stringify({ username: '{{username}}', password: '{{password}}' }),
       );
       assert.deepEqual(template.parameters, [
         { key: 'username' },
@@ -369,7 +369,7 @@ describe('json-template', () => {
       ]);
       assert.equal(
         template({ username: () => 'John', password: () => 'John' }),
-        '{"username":"John","password":"John"}'
+        '{"username":"John","password":"John"}',
       );
     });
   });
@@ -612,7 +612,7 @@ describe('json-template', () => {
             minimum_should_match: 1,
             boost: 1,
           },
-        }
+        },
       );
     });
   });
@@ -698,7 +698,7 @@ describe('json-template', () => {
       });
       assert.deepStrictEqual(
         template({ foo: { isNull: null, isNonNull: 'value' } }),
-        { boo: ' undefined value' }
+        { boo: ' undefined value' },
       );
     });
   });

@@ -42,7 +42,7 @@ function Parameter(match) {
 // Constructs a template function with deduped `parameters` property.
 function Template(fn, parameters) {
   fn.parameters = Array.from(
-    new Map(parameters.map((parameter) => [parameter.key, parameter])).values()
+    new Map(parameters.map((parameter) => [parameter.key, parameter])).values(),
   );
   return fn;
 }
@@ -131,9 +131,9 @@ function parseObject(object) {
     (parameters, child) =>
       parameters.concat(
         child.valueTemplate.parameters,
-        child.keyTemplate.parameters
+        child.keyTemplate.parameters,
       ),
-    []
+    [],
   );
   const templateFn = (context) => {
     return children.reduce((newObject, child) => {
@@ -150,7 +150,7 @@ function parseArray(array) {
   const templates = array.map(parse);
   const templateParameters = templates.reduce(
     (parameters, template) => parameters.concat(template.parameters),
-    []
+    [],
   );
   const templateFn = (context) =>
     templates.map((template) => template(context));

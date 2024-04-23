@@ -26,9 +26,9 @@
   },
   "homepage": "https://github.com/datavis-tech/json-templates#readme",
   "devDependencies": {
-    "mocha": "^10.2.0",
-    "prettier": "^2.8.8",
-    "rollup": "^3.26.0",
+    "mocha": "^10.4.0",
+    "prettier": "^3.2.5",
+    "rollup": "^4.16.4",
     "rollup-plugin-buble": "^0.19.8"
   },
   "dependencies": {
