@@ -19,26 +19,6 @@ function type(value) {
   return valueType;
 }
 
-// Constructs a parameter object from a match result.
-// e.g. "['{{foo}}']" --> { key: "foo" }
-// e.g. "['{{foo:bar}}']" --> { key: "foo", defaultValue: "bar" }
-function Parameter(match) {
-  let param;
-  const matchValue = match.substr(2, match.length - 4).trim();
-  const i = matchValue.indexOf(':');
-
-  if (i !== -1) {
-    param = {
-      key: matchValue.substr(0, i),
-      defaultValue: matchValue.substr(i + 1),
-    };
-  } else {
-    param = { key: matchValue };
-  }
-
-  return param;
-}
-
 // Constructs a template function with deduped `parameters` property.
 function Template(fn, parameters) {
   fn.parameters = Array.from(
@@ -55,14 +35,14 @@ function Template(fn, parameters) {
 // The returned function has a `parameters` property,
 // which is an array of parameter descriptor objects,
 // each of which has a `key` property and possibly a `defaultValue` property.
-function parse(value) {
+function parse(value, options) {
   switch (type(value)) {
     case 'string':
-      return parseString(value);
+      return parseString(value, options);
     case 'object':
-      return parseObject(value);
+      return parseObject(value, options);
     case 'array':
-      return parseArray(value);
+      return parseArray(value, options);
     default:
       return Template(function () {
         return value;
@@ -72,60 +52,57 @@ function parse(value) {
 
 // Parses leaf nodes of the template object that are strings.
 // Also used for parsing keys that contain templates.
-const parseString = (() => {
-  // This regular expression detects instances of the
-  // template parameter syntax such as {{foo}} or {{foo:someDefault}}.
-  const regex = /{{(\w|:|[\s-+.,@/\//()?=*_$])+}}/g;
+function parseString(str, options = {}) {
+  const regex = /\{\{\s*([\p{L}_$][\p{L}\p{N}_.$-]*)(?::([^}]*))?\s*\}\}/gu;
 
-  return (str) => {
-    let parameters = [];
-    let templateFn = () => str;
+  let templateFn = () => str;
 
-    const matches = str.match(regex);
-    if (matches) {
-      parameters = matches.map(Parameter);
-      templateFn = (context) => {
-        context = context || {};
-        return matches.reduce((result, match, i) => {
-          const parameter = parameters[i];
-          let value = objectPath.get(context, parameter.key);
-
-          if (typeof value === 'undefined') {
-            value = parameter.defaultValue;
-          }
-
-          if (typeof value === 'function') {
-            value = value();
-          }
-
-          // Accommodate non-string as original values.
-          if (
-            matches.length === 1 &&
-            str.startsWith('{{') &&
-            str.endsWith('}}')
-          ) {
-            return value;
-          }
-
-          // Treat Date value inside string to ISO string.
-          if (value instanceof Date) {
-            value = value.toISOString();
-          }
-
-          return result.replace(match, value == null ? '' : value);
-        }, str);
-      };
+  const matches = Array.from(str.matchAll(regex))
+  const parameters = matches.map((match) => {
+    const r = {
+      key: match[1],
+    };
+    if (match[2]) {
+      r.defaultValue = match[2];
     }
+    return r;
+  });
 
-    return Template(templateFn, parameters);
-  };
-})();
+  if (matches.length > 0) {
+    templateFn = (context = {}) => {
+      return matches.reduce((result, match, i) => {
+        const parameter = parameters[i];
+        let value = objectPath.get(context, options.rawKey ? [parameter.key] : parameter.key);
+
+        if (typeof value === 'undefined') {
+          value = parameter.defaultValue;
+        }
+
+        if (typeof value === 'function') {
+          value = value();
+        }
+
+        if (matches.length === 1 && str.trim() === match[0]) {
+          return value;
+        }
+
+        if (value instanceof Date) {
+          value = value.toISOString();
+        }
+
+        return result.replace(match[0], value == null ? '' : value);
+      }, str);
+    };
+  }
+
+  return Template(templateFn, parameters);
+}
 
 // Parses non-leaf-nodes in the template object that are objects.
-function parseObject(object) {
+function parseObject(object, options) {
   const children = Object.keys(object).map((key) => ({
-    keyTemplate: parseString(key),
-    valueTemplate: parse(object[key]),
+    keyTemplate: parseString(key, options),
+    valueTemplate: parse(object[key], options),
   }));
   const templateParameters = children.reduce(
     (parameters, child) =>
@@ -146,8 +123,8 @@ function parseObject(object) {
 }
 
 // Parses non-leaf-nodes in the template object that are arrays.
-function parseArray(array) {
-  const templates = array.map(parse);
+function parseArray(array, options) {
+  const templates = array.map((t) => parse(t, options));
   const templateParameters = templates.reduce(
     (parameters, template) => parameters.concat(template.parameters),
     [],
