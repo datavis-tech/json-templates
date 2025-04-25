@@ -28,6 +28,15 @@ describe('json-template', () => {
       assert.equal(template(), 'baz');
     });
 
+    it('should compute template for a string as raw key with rawKey option', () => {
+      const template = parse('{{foo.value:baz}}', { rawKey: true });
+      assert.deepEqual(template.parameters, [
+        { key: 'foo.value', defaultValue: 'baz' },
+      ]);
+      assert.equal(template({ 'foo.value': 'bar' }), 'bar');
+      assert.equal(template(), 'baz');
+    });
+
     it('should compute template for strings with no parameters', () => {
       ['foo', '{{}}', '}}{{', '}}foo{{'].forEach(function (value) {
         const template = parse(value);
@@ -699,6 +708,25 @@ describe('json-template', () => {
       assert.deepStrictEqual(
         template({ foo: { isNull: null, isNonNull: 'value' } }),
         { boo: ' undefined value' },
+      );
+    });
+  });
+
+  describe('unicode', () => {
+    it('should compute key with unicode', () => {
+      const template = parse({
+        title: '{{中文}}',
+      });
+
+      assert.deepEqual(template.parameters, [
+        { key: '中文' },
+      ]);
+
+      assert.deepEqual(
+        template({ 中文: 'foo' }),
+        {
+          title: 'foo',
+        },
       );
     });
   });
