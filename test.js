@@ -199,6 +199,20 @@ describe('json-template', () => {
       assert.deepEqual(template({ $foo: 'bar' }), { title: 'bar' });
     });
 
+    it('should use a $ symbol in a name, any place', () => {
+      const template = parse({ title: '{{$foo$}}' });
+      assert.deepEqual(template.parameters, [{ key: '$foo$' }]);
+      assert.deepEqual(template({ '$foo$': 'bar' }), { title: 'bar' });
+    });
+
+    it('should use a - symbol in a name, any place except first letter', () => {
+      const template = parse({ title: '{{foo-}}' });
+      assert.deepEqual(template.parameters, [{ key: 'foo-' }]);
+      assert.deepEqual(template({ 'foo-': 'bar' }), { title: 'bar' });
+
+      assert.deepEqual(parse({ title: '{{-a}}' })({ '-a': 'bar' }), { title: '{{-a}}' });
+    });
+
     it('should compute template with an object with multiple parameters', () => {
       const template = parse({
         title: '{{myTitle}}',

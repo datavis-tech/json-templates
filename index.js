@@ -53,7 +53,7 @@ function parse(value, options) {
 // Parses leaf nodes of the template object that are strings.
 // Also used for parsing keys that contain templates.
 function parseString(str, options = {}) {
-  const regex = /\{\{\s*([\p{L}_$][\p{L}\p{N}_.]*)(?::([^}]*))?\s*\}\}/gu;
+  const regex = /\{\{\s*([\p{L}_$][\p{L}\p{N}_.$-]*)(?::([^}]*))?\s*\}\}/gu;
 
   let templateFn = () => str;
 
