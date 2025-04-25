@@ -57,7 +57,7 @@ function parseString(str, options = {}) {
 
   let templateFn = () => str;
 
-  const matches = Array.from(str.matchAll(regex))
+  const matches = Array.from(str.matchAll(regex));
   const parameters = matches.map((match) => {
     const r = {
       key: match[1],
@@ -72,7 +72,10 @@ function parseString(str, options = {}) {
     templateFn = (context = {}) => {
       return matches.reduce((result, match, i) => {
         const parameter = parameters[i];
-        let value = objectPath.get(context, options.rawKey ? [parameter.key] : parameter.key);
+        let value = objectPath.get(
+          context,
+          options.rawKey ? [parameter.key] : parameter.key,
+        );
 
         if (typeof value === 'undefined') {
           value = parameter.defaultValue;
