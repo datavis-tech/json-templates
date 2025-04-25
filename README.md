@@ -75,7 +75,7 @@ You can use templates in object keys, not just values:
 
 ```js
 const template = parse({
-  'A simple {{message}} to': 'value'
+  'A simple {{message}} to': 'value',
 });
 console.log(template({ message: 'hello' })); // Prints { "A simple hello to": "value" }
 ```
@@ -91,7 +91,7 @@ const template2 = parse('{{foo$}}');
 
 // - symbol can be used anywhere except as first character
 const template3 = parse('{{foo-bar}}'); // Works
-const template4 = parse('{{-foo}}');    // Won't work
+const template4 = parse('{{-foo}}'); // Won't work
 ```
 
 ### Unicode Support
@@ -100,7 +100,7 @@ Parameter names can include Unicode characters:
 
 ```js
 const template = parse('{{中文}}');
-console.log(template({ '中文': 'value' })); // Prints "value"
+console.log(template({ 中文: 'value' })); // Prints "value"
 ```
 
 ### Function Values
@@ -109,9 +109,11 @@ Templates can handle functions as values:
 
 ```js
 const template = parse('{{userCard}}');
-console.log(template({
-  userCard: () => ({ id: 1, user: 'John' })
-})); // Prints { id: 1, user: 'John' }
+console.log(
+  template({
+    userCard: () => ({ id: 1, user: 'John' }),
+  }),
+); // Prints { id: 1, user: 'John' }
 ```
 
 ### Date Objects

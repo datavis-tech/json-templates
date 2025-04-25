@@ -202,7 +202,7 @@ describe('json-template', () => {
     it('should use a $ symbol in a name, any place', () => {
       const template = parse({ title: '{{$foo$}}' });
       assert.deepEqual(template.parameters, [{ key: '$foo$' }]);
-      assert.deepEqual(template({ '$foo$': 'bar' }), { title: 'bar' });
+      assert.deepEqual(template({ $foo$: 'bar' }), { title: 'bar' });
     });
 
     it('should use a - symbol in a name, any place except first letter', () => {
@@ -210,7 +210,9 @@ describe('json-template', () => {
       assert.deepEqual(template.parameters, [{ key: 'foo-' }]);
       assert.deepEqual(template({ 'foo-': 'bar' }), { title: 'bar' });
 
-      assert.deepEqual(parse({ title: '{{-a}}' })({ '-a': 'bar' }), { title: '{{-a}}' });
+      assert.deepEqual(parse({ title: '{{-a}}' })({ '-a': 'bar' }), {
+        title: '{{-a}}',
+      });
     });
 
     it('should compute template with an object with multiple parameters', () => {
@@ -732,16 +734,11 @@ describe('json-template', () => {
         title: '{{中文}}',
       });
 
-      assert.deepEqual(template.parameters, [
-        { key: '中文' },
-      ]);
+      assert.deepEqual(template.parameters, [{ key: '中文' }]);
 
-      assert.deepEqual(
-        template({ 中文: 'foo' }),
-        {
-          title: 'foo',
-        },
-      );
+      assert.deepEqual(template({ 中文: 'foo' }), {
+        title: 'foo',
+      });
     });
   });
 });
